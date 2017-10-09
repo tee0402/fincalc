@@ -80,20 +80,20 @@ public class Main {
         }
         else {
           System.out.println("Please enter valid arguments for MAINT:");
-          System.out.println("MAINT [currency 1 name] [currency 2 name] [conversion rate]");
+          System.out.println("MAINT [currency 1] [currency 2] [conversion rate]");
         }
         maintScanner.close();
       }
       else if (command.toLowerCase().startsWith("deposit")) {
-
+        
       }
       else if (command.toLowerCase().startsWith("withdraw")) {
 
       }
       else if (command.toLowerCase().equals("help")) {
         System.out.println("LIST OF COMMANDS:");
-        System.out.println("MAINT [currency 1 name] [currency 2 name] [conversion rate] - Enter currency conversion data");
-        System.out.println("  - Use ISO Codes for currency names, e.g. USD, EUR, JPY");
+        System.out.println("MAINT [currency 1] [currency 2] [conversion rate] - Enter currency conversion data");
+        System.out.println("  - Use ISO Codes for currencies, e.g. USD, EUR, JPY");
         System.out.println("  - Conversion rate is the number of units of currency 2 that are equal to one unit of currency 1");
         System.out.println("quit - Exit the program");
       }
