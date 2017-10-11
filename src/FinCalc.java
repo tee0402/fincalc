@@ -137,13 +137,13 @@ class FinCalc {
         if (username.length() > 0 && username.matches("[a-zA-Z]+$") && currency.length() == 3 && currency.matches("[a-zA-Z]+$") && amount.compareTo(BigDecimal.ZERO) > 0) {
           if (currency.equals("USD")) {
             changeBalance(username, amount, true);
-            System.out.println("Deposited " + amount.setScale(2, BigDecimal.ROUND_HALF_UP) + " USD into the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_UP) + " USD.");
+            System.out.println("Deposited " + amount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD into the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
           }
           else {
             BigDecimal convertedAmount = convert(currency, "USD", amount);
             if (convertedAmount.compareTo(BigDecimal.ZERO) > 0) {
               changeBalance(username, convertedAmount, true);
-              System.out.println("Deposited " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_UP) + " USD into the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_UP) + " USD.");
+              System.out.println("Deposited " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD into the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
             }
             else {
               System.out.println("No conversion data to USD. Please enter conversion data first.");
@@ -175,7 +175,7 @@ class FinCalc {
         if (username.length() > 0 && username.matches("[a-zA-Z]+$") && currency.length() == 3 && currency.matches("[a-zA-Z]+$") && amount.compareTo(BigDecimal.ZERO) > 0) {
           if (currency.equals("USD")) {
             if (changeBalance(username, amount, false)) {
-              System.out.println("Withdrew " + amount.setScale(2, BigDecimal.ROUND_HALF_UP) + " USD from the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_UP) + " USD.");
+              System.out.println("Withdrew " + amount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD from the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
             }
             else {
               System.out.println("Insufficient funds.");
@@ -185,7 +185,7 @@ class FinCalc {
             BigDecimal convertedAmount = convert(currency, "USD", amount);
             if (convertedAmount.compareTo(BigDecimal.ZERO) > 0) {
               if (changeBalance(username, convertedAmount, false)) {
-                System.out.println("Withdrew " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_UP) + " USD from the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_UP) + " USD.");
+                System.out.println("Withdrew " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD from the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
               }
               else {
                 System.out.println("Insufficient funds.");
