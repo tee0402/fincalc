@@ -1,9 +1,11 @@
+import java.math.*;
+
 class CurrencyPair {
   private String currency1;
   private String currency2;
-  private double conversionRate;
+  private BigDecimal conversionRate;
 
-  CurrencyPair(String currency1, String currency2, double conversionRate) {
+  CurrencyPair(String currency1, String currency2, BigDecimal conversionRate) {
     this.currency1 = currency1;
     this.currency2 = currency2;
     this.conversionRate = conversionRate;
@@ -17,7 +19,7 @@ class CurrencyPair {
     return currency2;
   }
 
-  double getConversionRate() {
+  BigDecimal getConversionRate() {
     return conversionRate;
   }
 

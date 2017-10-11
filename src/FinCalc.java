@@ -1,9 +1,11 @@
+import java.math.*;
 import java.util.*;
 import java.io.*;
 
 class FinCalc {
   private ArrayList<CurrencyPair> currencyPairs;
   private ArrayList<Account> accounts;
+  private MathContext mathContext = new MathContext(2);
 
   FinCalc() {
     currencyPairs = new ArrayList<>();
@@ -20,7 +22,7 @@ class FinCalc {
         while (fileReader.hasNextLine()) {
           String line = fileReader.nextLine();
           Scanner lineScanner = new Scanner(line);
-          CurrencyPair currencyPair = new CurrencyPair(lineScanner.next(), lineScanner.next(), Double.valueOf(lineScanner.next()));
+          CurrencyPair currencyPair = new CurrencyPair(lineScanner.next(), lineScanner.next(), new BigDecimal(lineScanner.next()));
           currencyPairs.add(currencyPair);
         }
         fileReader.close();
@@ -39,7 +41,7 @@ class FinCalc {
         while (fileReader.hasNextLine()) {
           String line = fileReader.nextLine();
           Scanner lineScanner = new Scanner(line);
-          Account account = new Account(lineScanner.next(), Double.valueOf(lineScanner.next()));
+          Account account = new Account(lineScanner.next(), new BigDecimal(lineScanner.next()));
           accounts.add(account);
         }
         fileReader.close();
@@ -65,7 +67,7 @@ class FinCalc {
       if (command.toUpperCase().startsWith("MAINT")) {
         String currency1 = "";
         String currency2 = "";
-        double conversionRate = 0d;
+        BigDecimal conversionRate = BigDecimal.ZERO;
         Scanner sc = new Scanner(command);
         sc.next();
 
@@ -75,11 +77,11 @@ class FinCalc {
         if (sc.hasNext()) {
           currency2 = sc.next().toUpperCase();
         }
-        if (sc.hasNextInt() || sc.hasNextDouble()) {
-          conversionRate = Double.valueOf(sc.next());
+        if (sc.hasNextBigDecimal()) {
+          conversionRate = sc.nextBigDecimal();
         }
 
-        if (currency1.length() == 3 && currency1.matches("[a-zA-Z]+$") && currency2.length() == 3 && currency2.matches("[a-zA-Z]+$") && conversionRate > 0) {
+        if (currency1.length() == 3 && currency1.matches("[a-zA-Z]+$") && currency2.length() == 3 && currency2.matches("[a-zA-Z]+$") && conversionRate.compareTo(BigDecimal.ZERO) > 0) {
           boolean boolVerified = false;
 
           System.out.println(currency1 + "/" + currency2 + "=" + conversionRate);
@@ -91,7 +93,7 @@ class FinCalc {
               case "y":
                 boolVerified = true;
                 CurrencyPair currencyPair = new CurrencyPair(currency1, currency2, conversionRate);
-                if (getCurrencyPair(currencyPair, currencyPairs) < 0) {
+                if (getCurrencyPair(currencyPair, currencyPairs) == -1) {
                   saveCurrencyData(currency1, currency2, conversionRate);
                   currencyPairs.add(currencyPair);
                   System.out.println("Currency pair saved.");
@@ -118,7 +120,7 @@ class FinCalc {
       else if (command.toLowerCase().startsWith("deposit")) {
         String username = "";
         String currency = "";
-        double amount = 0d;
+        BigDecimal amount = BigDecimal.ZERO;
         Scanner sc = new Scanner(command);
         sc.next();
 
@@ -128,20 +130,20 @@ class FinCalc {
         if (sc.hasNext()) {
           currency = sc.next().toUpperCase();
         }
-        if (sc.hasNextInt() || sc.hasNextDouble()) {
-          amount = Double.valueOf(sc.next());
+        if (sc.hasNextBigDecimal()) {
+          amount = sc.nextBigDecimal();
         }
 
-        if (username.length() > 0 && username.matches("[a-zA-Z]+$") && currency.length() == 3 && currency.matches("[a-zA-Z]+$") && amount > 0) {
+        if (username.length() > 0 && username.matches("[a-zA-Z]+$") && currency.length() == 3 && currency.matches("[a-zA-Z]+$") && amount.compareTo(BigDecimal.ZERO) > 0) {
           if (currency.equals("USD")) {
             changeBalance(username, amount, true);
-            System.out.println("Deposited " + amount + " USD into the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance() + " USD.");
+            System.out.println("Deposited " + amount.setScale(2, BigDecimal.ROUND_HALF_UP) + " USD into the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_UP) + " USD.");
           }
           else {
-            double convertedAmount = convert(currency, "USD", amount);
-            if (convertedAmount >= 0) {
+            BigDecimal convertedAmount = convert(currency, "USD", amount);
+            if (convertedAmount.compareTo(BigDecimal.ZERO) > 0) {
               changeBalance(username, convertedAmount, true);
-              System.out.println("Deposited " + convertedAmount + " USD into the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance() + " USD.");
+              System.out.println("Deposited " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_UP) + " USD into the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_UP) + " USD.");
             }
             else {
               System.out.println("No conversion data to USD. Please enter conversion data first.");
@@ -156,7 +158,7 @@ class FinCalc {
       else if (command.toLowerCase().startsWith("withdraw")) {
         String username = "";
         String currency = "";
-        double amount = 0d;
+        BigDecimal amount = BigDecimal.ZERO;
         Scanner sc = new Scanner(command);
         sc.next();
 
@@ -166,24 +168,24 @@ class FinCalc {
         if (sc.hasNext()) {
           currency = sc.next().toUpperCase();
         }
-        if (sc.hasNextInt() || sc.hasNextDouble()) {
-          amount = Double.valueOf(sc.next());
+        if (sc.hasNextBigDecimal()) {
+          amount = sc.nextBigDecimal();
         }
 
-        if (username.length() > 0 && username.matches("[a-zA-Z]+$") && currency.length() == 3 && currency.matches("[a-zA-Z]+$") && amount > 0) {
+        if (username.length() > 0 && username.matches("[a-zA-Z]+$") && currency.length() == 3 && currency.matches("[a-zA-Z]+$") && amount.compareTo(BigDecimal.ZERO) > 0) {
           if (currency.equals("USD")) {
             if (changeBalance(username, amount, false)) {
-              System.out.println("Withdrew " + amount + " USD from the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance() + " USD.");
+              System.out.println("Withdrew " + amount.setScale(2, BigDecimal.ROUND_HALF_UP) + " USD from the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_UP) + " USD.");
             }
             else {
               System.out.println("Insufficient funds.");
             }
           }
           else {
-            double convertedAmount = convert(currency, "USD", amount);
-            if (convertedAmount >= 0) {
+            BigDecimal convertedAmount = convert(currency, "USD", amount);
+            if (convertedAmount.compareTo(BigDecimal.ZERO) > 0) {
               if (changeBalance(username, convertedAmount, false)) {
-                System.out.println("Withdrew " + convertedAmount + " USD from the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance() + " USD.");
+                System.out.println("Withdrew " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_UP) + " USD from the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_UP) + " USD.");
               }
               else {
                 System.out.println("Insufficient funds.");
@@ -200,10 +202,11 @@ class FinCalc {
         }
       }
       else if (command.toLowerCase().equals("help")) {
+        System.out.println("Use ISO Codes for currencies, e.g. USD, EUR, JPY");
+        System.out.println("Conversion rate is the number of units of currency 2 that are equal to one unit of currency 1");
+        System.out.println();
         System.out.println("LIST OF COMMANDS:");
         System.out.println("MAINT [currency 1] [currency 2] [conversion rate] - Enter currency conversion data");
-        System.out.println("  - Use ISO Codes for currencies, e.g. USD, EUR, JPY");
-        System.out.println("  - Conversion rate is the number of units of currency 2 that are equal to one unit of currency 1");
         System.out.println("deposit [username] [currency] [amount] - Deposit <amount> in <currency> into account with <username>");
         System.out.println("withdraw [username] [currency] [amount] - Withdraw <amount> in <currency> from account with <username>");
         System.out.println("quit - Exit the program");
@@ -229,7 +232,7 @@ class FinCalc {
     return -1;
   }
 
-  private void saveCurrencyData(String currency1, String currency2, double conversionRate) {
+  private void saveCurrencyData(String currency1, String currency2, BigDecimal conversionRate) {
     try {
       FileWriter fileWriter = new FileWriter(new File("currency.txt"), true);
       fileWriter.write(currency1 + " " + currency2 + " " + conversionRate + "\n");
@@ -249,7 +252,7 @@ class FinCalc {
     return -1;
   }
 
-  private boolean changeBalance(String username, double amount, boolean deposit) {
+  private boolean changeBalance(String username, BigDecimal amount, boolean deposit) {
     int accountIndex = getAccount(username, accounts);
     if (accountIndex == -1) {
       if (deposit) {
@@ -264,14 +267,14 @@ class FinCalc {
     }
     else {
       if (deposit) {
-        double newBalance = accounts.get(accountIndex).getBalance() + amount;
+        BigDecimal newBalance = accounts.get(accountIndex).getBalance().add(amount);
         accounts.get(accountIndex).setBalance(newBalance);
         updateAccountData(username, newBalance);
         return true;
       }
       else {
-        double newBalance = accounts.get(accountIndex).getBalance() - amount;
-        if (newBalance >= 0) {
+        BigDecimal newBalance = accounts.get(accountIndex).getBalance().subtract(amount);
+        if (newBalance.compareTo(BigDecimal.ZERO) >= 0) {
           accounts.get(accountIndex).setBalance(newBalance);
           updateAccountData(username, newBalance);
           return true;
@@ -283,7 +286,7 @@ class FinCalc {
     }
   }
 
-  private void saveNewAccountData(String username, double balance) {
+  private void saveNewAccountData(String username, BigDecimal balance) {
     try {
       FileWriter fileWriter = new FileWriter(new File("account.txt"), true);
       fileWriter.write(username + " " + balance + "\n");
@@ -294,14 +297,14 @@ class FinCalc {
     }
   }
 
-  private void updateAccountData(String username, double balance) {
+  private void updateAccountData(String username, BigDecimal balance) {
     try {
       File oldAccount = new File("account.txt");
       File newAccount = new File("temp");
       Scanner scanner = new Scanner(oldAccount);
       FileWriter fileWriter = new FileWriter(newAccount);
       while (scanner.hasNextLine()){
-        String line = scanner.nextLine();
+        String line = scanner.nextLine() + "\n";
         if (line.startsWith(username)) {
           fileWriter.write(username + " " + balance + "\n");
         }
@@ -319,19 +322,19 @@ class FinCalc {
     }
   }
 
-  private double convert(String currency1, String currency2, double amount) {
-    CurrencyPair currencyPair1 = new CurrencyPair(currency1, currency2, 1);
-    CurrencyPair currencyPair2 = new CurrencyPair(currency2, currency1, 1);
+  private BigDecimal convert(String currency1, String currency2, BigDecimal amount) {
+    CurrencyPair currencyPair1 = new CurrencyPair(currency1, currency2, BigDecimal.ONE);
+    CurrencyPair currencyPair2 = new CurrencyPair(currency2, currency1, BigDecimal.ONE);
     int currencyIndex1 = getCurrencyPair(currencyPair1, currencyPairs);
     int currencyIndex2 = getCurrencyPair(currencyPair2, currencyPairs);
     if (currencyIndex1 >= 0) {
-      return Math.round(currencyPairs.get(currencyIndex1).getConversionRate() * amount * 100.0) / 100.0;
+      return currencyPairs.get(currencyIndex1).getConversionRate().multiply(amount);
     }
     else if (currencyIndex2 >= 0) {
-      return Math.round(1 / currencyPairs.get(currencyIndex2).getConversionRate() * amount * 100.0) / 100.0;
+      return BigDecimal.ONE.divide(currencyPairs.get(currencyIndex2).getConversionRate(), mathContext).multiply(amount);
     }
     else {
-      return -1;
+      return BigDecimal.valueOf(-1);
     }
   }
 }

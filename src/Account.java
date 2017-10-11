@@ -1,8 +1,10 @@
+import java.math.*;
+
 class Account {
   private String username;
-  private double balance;
+  private BigDecimal balance;
 
-  Account(String username, double balance) {
+  Account(String username, BigDecimal balance) {
     this.username = username;
     this.balance = balance;
   }
@@ -11,11 +13,11 @@ class Account {
     return username;
   }
 
-  double getBalance() {
+  BigDecimal getBalance() {
     return balance;
   }
 
-  void setBalance(double balance) {
+  void setBalance(BigDecimal balance) {
     this.balance = balance;
   }
 }
