@@ -133,6 +133,9 @@ class FinCalc {
         if (sc.hasNextBigDecimal()) {
           amount = sc.nextBigDecimal();
         }
+        else if (sc.hasNext()) {
+          amount = new BigDecimal(sc.next().replaceAll("[^0-9.]", ""));
+        }
 
         if (username.length() > 0 && username.matches("[a-zA-Z]+$") && currency.length() == 3 && currency.matches("[a-zA-Z]+$") && amount.compareTo(BigDecimal.ZERO) > 0) {
           if (currency.equals("USD")) {
@@ -170,6 +173,9 @@ class FinCalc {
         }
         if (sc.hasNextBigDecimal()) {
           amount = sc.nextBigDecimal();
+        }
+        else if (sc.hasNext()) {
+          amount = new BigDecimal(sc.next().replaceAll("[^0-9.]", ""));
         }
 
         if (username.length() > 0 && username.matches("[a-zA-Z]+$") && currency.length() == 3 && currency.matches("[a-zA-Z]+$") && amount.compareTo(BigDecimal.ZERO) > 0) {
