@@ -17,7 +17,7 @@ class CurrencyPair {
     return currency2;
   }
 
-  private double getConversionRate() {
+  double getConversionRate() {
     return conversionRate;
   }
 
