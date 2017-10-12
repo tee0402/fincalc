@@ -80,6 +80,12 @@ class FinCalc {
         if (sc.hasNextBigDecimal()) {
           conversionRate = sc.nextBigDecimal();
         }
+        else if (sc.hasNext()) {
+          String next = sc.next().replaceAll("[^0-9a-zA-Z.]", "");
+          if (isNumeric(next)) {
+            conversionRate = new BigDecimal(next);
+          }
+        }
 
         if (currency1.length() == 3 && currency1.matches("[a-zA-Z]+$") && currency2.length() == 3 && currency2.matches("[a-zA-Z]+$") && conversionRate.compareTo(BigDecimal.ZERO) > 0) {
           boolean boolVerified = false;
@@ -134,7 +140,10 @@ class FinCalc {
           amount = sc.nextBigDecimal();
         }
         else if (sc.hasNext()) {
-          amount = new BigDecimal(sc.next().replaceAll("[^0-9.]", ""));
+          String next = sc.next().replaceAll("[^0-9a-zA-Z.]", "");
+          if (isNumeric(next)) {
+            amount = new BigDecimal(next);
+          }
         }
 
         if (username.length() > 0 && username.matches("[a-zA-Z]+$") && currency.length() == 3 && currency.matches("[a-zA-Z]+$") && amount.compareTo(BigDecimal.ZERO) > 0) {
@@ -175,7 +184,10 @@ class FinCalc {
           amount = sc.nextBigDecimal();
         }
         else if (sc.hasNext()) {
-          amount = new BigDecimal(sc.next().replaceAll("[^0-9.]", ""));
+          String next = sc.next().replaceAll("[^0-9a-zA-Z.]", "");
+          if (isNumeric(next)) {
+            amount = new BigDecimal(next);
+          }
         }
 
         if (username.length() > 0 && username.matches("[a-zA-Z]+$") && currency.length() == 3 && currency.matches("[a-zA-Z]+$") && amount.compareTo(BigDecimal.ZERO) > 0) {
@@ -247,6 +259,10 @@ class FinCalc {
     catch (Exception e) {
       System.out.println(e.getMessage());
     }
+  }
+
+  private boolean isNumeric(String s) {
+    return s != null && s.matches("[-+]?\\d*\\.?\\d+");
   }
 
   private int getAccount(String username, ArrayList<Account> accounts) {
