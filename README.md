@@ -5,3 +5,4 @@ The easiest way to run this program is to clone this repository to your favorite
 
 Once the application has started, type 'help' to see a list of commands. 'MAINT [currency 1] [currency 2] [conversion rate]' is used to enter in currency conversion data to USD. 'deposit [username] [currency] [amount]' is used to deposit into a user's account. 'withdraw [username] [currency] [amount]' is used to withdraw from a user's account. 'quit' exits the program.
 
+For currencies, only three letter currency ISO Codes can be entered. For usernames, there is no restriction on the format. The only caveat is that they are case-sensitive, so john and John are different users. For conversion rates and currency amounts, any special characters such as dollar signs are removed prior to processing. Commas are also removed, as they are assumed to be thousands separators and decimal points are assumed to be represented by a period, so any currencies using commas are not supported.
