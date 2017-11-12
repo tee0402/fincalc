@@ -207,14 +207,18 @@ class FinCalc {
           System.out.println("withdraw [username] [currency] [amount]");
         }
       }
+      else if (command.toLowerCase().equals("transfer")) {
+
+      }
       else if (command.toLowerCase().equals("help")) {
         System.out.println("Use ISO Codes for currencies, e.g. USD, EUR, JPY");
         System.out.println("Conversion rate is the number of units of currency 2 that are equal to one unit of currency 1");
         System.out.println();
         System.out.println("LIST OF COMMANDS:");
         System.out.println("MAINT [currency 1] [currency 2] [conversion rate] - Enter currency conversion data");
-        System.out.println("deposit [username] [currency] [amount] - Deposit <amount> in <currency> into account with <username>");
-        System.out.println("withdraw [username] [currency] [amount] - Withdraw <amount> in <currency> from account with <username>");
+        System.out.println("deposit [username] [currency] [amount] - Deposit <amount> in <currency> into account with username <username>");
+        System.out.println("withdraw [username] [currency] [amount] - Withdraw <amount> in <currency> from account with username <username>");
+        System.out.println("transfer [username] [currency] [amount] - Transfer <amount> in <currency> to account with username <username>");
         System.out.println("quit - Exit the program");
       }
       else if (command.toLowerCase().equals("quit")) {
