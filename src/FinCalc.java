@@ -56,32 +56,32 @@ class FinCalc {
     boolean running = true;
     Scanner scanner = new Scanner(System.in);
 
-    System.out.println("FinCalc 1.0");
+    System.out.println("FinCalc 2.0");
     System.out.println("Type 'help' for a list of commands.");
 
     while (running) {
       System.out.print(">> ");
 
-      String command = scanner.nextLine();
+      String commandLine = scanner.nextLine();
+      Scanner scannerCommandLine = new Scanner(commandLine);
+      String command = scannerCommandLine.next();
 
-      if (command.toUpperCase().startsWith("MAINT")) {
+      if (command.toUpperCase().equals("MAINT")) {
         String currency1 = "";
         String currency2 = "";
         BigDecimal conversionRate = BigDecimal.ZERO;
-        Scanner sc = new Scanner(command);
-        sc.next();
 
-        if (sc.hasNext()) {
-          currency1 = sc.next().toUpperCase();
+        if (scannerCommandLine.hasNext()) {
+          currency1 = scannerCommandLine.next().toUpperCase();
         }
-        if (sc.hasNext()) {
-          currency2 = sc.next().toUpperCase();
+        if (scannerCommandLine.hasNext()) {
+          currency2 = scannerCommandLine.next().toUpperCase();
         }
-        if (sc.hasNextBigDecimal()) {
-          conversionRate = sc.nextBigDecimal();
+        if (scannerCommandLine.hasNextBigDecimal()) {
+          conversionRate = scannerCommandLine.nextBigDecimal();
         }
 
-        if (currency1.length() == 3 && currency1.matches("[a-zA-Z]+$") && currency2.length() == 3 && currency2.matches("[a-zA-Z]+$") && conversionRate.compareTo(BigDecimal.ZERO) > 0) {
+        if (currency1.matches("^[a-zA-Z]{3}$") && currency2.matches("^[a-zA-Z]{3}$") && conversionRate.compareTo(BigDecimal.ZERO) > 0) {
           boolean boolVerified = false;
 
           System.out.println(currency1 + "/" + currency2 + "=" + conversionRate);
@@ -115,29 +115,26 @@ class FinCalc {
           System.out.println("Please enter valid arguments for MAINT:");
           System.out.println("MAINT [currency 1] [currency 2] [conversion rate]");
         }
-        sc.close();
       }
-      else if (command.toLowerCase().startsWith("deposit")) {
+      else if (command.toLowerCase().equals("deposit")) {
         String username = "";
         String currency = "";
         BigDecimal amount = BigDecimal.ZERO;
-        Scanner sc = new Scanner(command);
-        sc.next();
 
-        if (sc.hasNext()) {
-          username = sc.next();
+        if (scannerCommandLine.hasNext()) {
+          username = scannerCommandLine.next();
         }
-        if (sc.hasNext()) {
-          currency = sc.next().toUpperCase();
+        if (scannerCommandLine.hasNext()) {
+          currency = scannerCommandLine.next().toUpperCase();
         }
-        if (sc.hasNextBigDecimal()) {
-          amount = sc.nextBigDecimal();
+        if (scannerCommandLine.hasNextBigDecimal()) {
+          amount = scannerCommandLine.nextBigDecimal();
         }
-        else if (sc.hasNext()) {
-          amount = new BigDecimal(sc.next().replaceAll("[^0-9.]", ""));
+        else if (scannerCommandLine.hasNext()) {
+          amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
         }
 
-        if (username.length() > 0 && username.matches("[a-zA-Z]+$") && currency.length() == 3 && currency.matches("[a-zA-Z]+$") && amount.compareTo(BigDecimal.ZERO) > 0) {
+        if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[a-zA-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
           if (currency.equals("USD")) {
             changeBalance(username, amount, true);
             System.out.println("Deposited " + amount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD into the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
@@ -158,27 +155,25 @@ class FinCalc {
           System.out.println("deposit [username] [currency] [amount]");
         }
       }
-      else if (command.toLowerCase().startsWith("withdraw")) {
+      else if (command.toLowerCase().equals("withdraw")) {
         String username = "";
         String currency = "";
         BigDecimal amount = BigDecimal.ZERO;
-        Scanner sc = new Scanner(command);
-        sc.next();
 
-        if (sc.hasNext()) {
-          username = sc.next();
+        if (scannerCommandLine.hasNext()) {
+          username = scannerCommandLine.next();
         }
-        if (sc.hasNext()) {
-          currency = sc.next().toUpperCase();
+        if (scannerCommandLine.hasNext()) {
+          currency = scannerCommandLine.next().toUpperCase();
         }
-        if (sc.hasNextBigDecimal()) {
-          amount = sc.nextBigDecimal();
+        if (scannerCommandLine.hasNextBigDecimal()) {
+          amount = scannerCommandLine.nextBigDecimal();
         }
-        else if (sc.hasNext()) {
-          amount = new BigDecimal(sc.next().replaceAll("[^0-9.]", ""));
+        else if (scannerCommandLine.hasNext()) {
+          amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
         }
 
-        if (username.length() > 0 && username.matches("[a-zA-Z]+$") && currency.length() == 3 && currency.matches("[a-zA-Z]+$") && amount.compareTo(BigDecimal.ZERO) > 0) {
+        if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[a-zA-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
           if (currency.equals("USD")) {
             if (changeBalance(username, amount, false)) {
               System.out.println("Withdrew " + amount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD from the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
@@ -208,7 +203,30 @@ class FinCalc {
         }
       }
       else if (command.toLowerCase().equals("transfer")) {
+        String username = "";
+        String currency = "";
+        BigDecimal amount = BigDecimal.ZERO;
 
+        if (scannerCommandLine.hasNext()) {
+          username = scannerCommandLine.next();
+        }
+        if (scannerCommandLine.hasNext()) {
+          currency = scannerCommandLine.next().toUpperCase();
+        }
+        if (scannerCommandLine.hasNextBigDecimal()) {
+          amount = scannerCommandLine.nextBigDecimal();
+        }
+        else if (scannerCommandLine.hasNext()) {
+          amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
+        }
+
+        if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[a-zA-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
+
+        }
+        else {
+          System.out.println("Please enter valid arguments for transfer:");
+          System.out.println("transfer [username] [currency] [amount]");
+        }
       }
       else if (command.toLowerCase().equals("help")) {
         System.out.println("Use ISO Codes for currencies, e.g. USD, EUR, JPY");
@@ -227,6 +245,7 @@ class FinCalc {
       else {
         System.out.println("Please enter a valid command. Type 'help' for a list of commands.");
       }
+      scannerCommandLine.close();
     }
 
     scanner.close();
@@ -315,7 +334,8 @@ class FinCalc {
       FileWriter fileWriter = new FileWriter(newAccount);
       while (scanner.hasNextLine()){
         String line = scanner.nextLine() + "\n";
-        if (line.startsWith(username)) {
+        String scannedUsername = new Scanner(line).next();
+        if (scannedUsername.equals(username)) {
           fileWriter.write(username + " " + balance + "\n");
         }
         else {
