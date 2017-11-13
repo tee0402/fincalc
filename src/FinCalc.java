@@ -60,22 +60,33 @@ class FinCalc {
     }
   }
 
+  private String bytesToHex(byte[] bytes) {
+    StringBuilder builder = new StringBuilder();
+    for(byte b : bytes) {
+      builder.append(String.format("%02x", b));
+    }
+    return builder.toString();
+  }
+
   // Hashes a string using SHA-256 and returns the hash in hexadecimal form
   private String hash(String text) {
     try {
       MessageDigest digest = MessageDigest.getInstance("SHA-256");
       byte[] hash = digest.digest(text.getBytes(StandardCharsets.UTF_8));
-
-      StringBuilder builder = new StringBuilder();
-      for(byte b : hash) {
-        builder.append(String.format("%02x", b));
-      }
-      return builder.toString();
+      return bytesToHex(hash);
     }
     catch (Exception e) {
       System.out.println(e.getMessage());
       return null;
     }
+  }
+
+  // Returns a 256-bit salt
+  private String salt() {
+    byte[] salt = new byte[32];
+    Random random = new Random();
+    random.nextBytes(salt);
+    return bytesToHex(salt);
   }
 
   // Runs the command line application
