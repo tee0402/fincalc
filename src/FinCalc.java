@@ -1,19 +1,26 @@
 import java.math.*;
 import java.util.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 
 class FinCalc {
   private ArrayList<CurrencyPair> currencyPairs;
   private ArrayList<Account> accounts;
-  private MathContext mathContext = new MathContext(2);
+  private MathContext mathContext;
+  private boolean admin;
 
+  // Initializes variables and calls the functions for loading data
   FinCalc() {
     currencyPairs = new ArrayList<>();
     accounts = new ArrayList<>();
+    mathContext = new MathContext(2);
+    admin = false;
     loadCurrencyData();
     loadAccountData();
   }
 
+  // Loads currency pairs into ArrayList
   private void loadCurrencyData() {
     try {
       File file = new File("currency.txt");
@@ -33,6 +40,7 @@ class FinCalc {
     }
   }
 
+  // Loads usernames and balances into ArrayList
   private void loadAccountData() {
     try {
       File file = new File("account.txt");
@@ -52,6 +60,25 @@ class FinCalc {
     }
   }
 
+  // Hashes a string using SHA-256 and returns the hash in hexadecimal form
+  private String hash(String text) {
+    try {
+      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      byte[] hash = digest.digest(text.getBytes(StandardCharsets.UTF_8));
+
+      StringBuilder builder = new StringBuilder();
+      for(byte b : hash) {
+        builder.append(String.format("%02x", b));
+      }
+      return builder.toString();
+    }
+    catch (Exception e) {
+      System.out.println(e.getMessage());
+      return null;
+    }
+  }
+
+  // Runs the command line application
   void run() {
     boolean running = true;
     Scanner scanner = new Scanner(System.in);
@@ -252,6 +279,7 @@ class FinCalc {
     System.out.println("Goodbye.");
   }
 
+  // Returns the index of the specified currency pair in the ArrayList, returns -1 if not found
   private int getCurrencyPair(CurrencyPair currencyPair, ArrayList<CurrencyPair> currencyPairs) {
     for (int i = 0; i < currencyPairs.size(); i++) {
       if (currencyPairs.get(i).equals(currencyPair)) {
@@ -261,6 +289,7 @@ class FinCalc {
     return -1;
   }
 
+  // Writes currency conversion data to a text file
   private void saveCurrencyData(String currency1, String currency2, BigDecimal conversionRate) {
     try {
       FileWriter fileWriter = new FileWriter(new File("currency.txt"), true);
@@ -272,6 +301,7 @@ class FinCalc {
     }
   }
 
+  // Returns the index of the account with the specified username in the ArrayList, returns -1 if not found
   private int getAccount(String username, ArrayList<Account> accounts) {
     for (int i = 0; i < accounts.size(); i++) {
       if (accounts.get(i).getUsername().equals(username)) {
@@ -281,6 +311,7 @@ class FinCalc {
     return -1;
   }
 
+  // Changes the balance of the account with the specified username, returns true or false depending on whether the change succeeded
   private boolean changeBalance(String username, BigDecimal amount, boolean deposit) {
     int accountIndex = getAccount(username, accounts);
     if (accountIndex == -1) {
@@ -315,6 +346,7 @@ class FinCalc {
     }
   }
 
+  // Adds a new account to the text file
   private void saveNewAccountData(String username, BigDecimal balance) {
     try {
       FileWriter fileWriter = new FileWriter(new File("account.txt"), true);
@@ -326,6 +358,8 @@ class FinCalc {
     }
   }
 
+  // Updates the account balance of an existing account in the text file
+  // Does this by creating a temporary file, copying all lines except the one with the specified username, changing the balance for that line, deleting the old file and renaming the new file to the old file
   private void updateAccountData(String username, BigDecimal balance) {
     try {
       File oldAccount = new File("account.txt");
@@ -352,6 +386,7 @@ class FinCalc {
     }
   }
 
+  // Converts an amount from one currency to another, returns -1 if the currency pair does not exist
   private BigDecimal convert(String currency1, String currency2, BigDecimal amount) {
     CurrencyPair currencyPair1 = new CurrencyPair(currency1, currency2, BigDecimal.ONE);
     CurrencyPair currencyPair2 = new CurrencyPair(currency2, currency1, BigDecimal.ONE);
