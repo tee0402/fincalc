@@ -1,8 +1,8 @@
 import java.math.*;
 import java.util.*;
 import java.io.*;
+import java.security.*;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 
 class FinCalc {
   private ArrayList<CurrencyPair> currencyPairs;
@@ -60,6 +60,7 @@ class FinCalc {
     }
   }
 
+  // Converts a byte array to a hexadecimal string
   private String bytesToHex(byte[] bytes) {
     StringBuilder builder = new StringBuilder();
     for(byte b : bytes) {
@@ -84,7 +85,7 @@ class FinCalc {
   // Returns a 256-bit salt
   private String salt() {
     byte[] salt = new byte[32];
-    Random random = new Random();
+    SecureRandom random = new SecureRandom();
     random.nextBytes(salt);
     return bytesToHex(salt);
   }
