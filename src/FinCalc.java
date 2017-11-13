@@ -1,8 +1,8 @@
 import java.math.*;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.io.*;
 import java.security.*;
-import java.nio.charset.StandardCharsets;
 
 class FinCalc {
   private ArrayList<CurrencyPair> currencyPairs;
@@ -73,7 +73,7 @@ class FinCalc {
   private String hash(String text) {
     try {
       MessageDigest digest = MessageDigest.getInstance("SHA-256");
-      byte[] hash = digest.digest(text.getBytes(StandardCharsets.UTF_8));
+      byte[] hash = digest.digest(text.getBytes("UTF-8"));
       return bytesToHex(hash);
     }
     catch (Exception e) {
