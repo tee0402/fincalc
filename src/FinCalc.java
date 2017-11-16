@@ -100,14 +100,14 @@ class FinCalc {
     boolean running = true;
     boolean authenticated = false;
     Scanner scanner = new Scanner(System.in);
-    String usernameInput = "";
+    String loginUsername = "";
 
     while (!authenticated) {
       System.out.print("Please enter your username: ");
-      usernameInput = scanner.nextLine();
+      loginUsername = scanner.nextLine();
       System.out.print("Please enter your password: ");
-      String passwordInput = scanner.nextLine();
-      if (authenticate(usernameInput, passwordInput)) {
+      String loginPassword = scanner.nextLine();
+      if (authenticate(loginUsername, loginPassword)) {
         authenticated = true;
       }
       else {
@@ -115,11 +115,7 @@ class FinCalc {
       }
     }
 
-    if (usernameInput.equals("admin")) {
-      admin = true;
-    }
-
-    if (admin) {
+    if (loginUsername.equals("admin")) {
       System.out.println("FinCalc 2.0 - ADMIN");
       System.out.println("Type 'help' for a list of commands.");
 
@@ -302,13 +298,9 @@ class FinCalc {
           }
         }
         else if (command.toLowerCase().equals("deposit")) {
-          String username = "";
           String currency = "";
           BigDecimal amount = BigDecimal.ZERO;
 
-          if (scannerCommandLine.hasNext()) {
-            username = scannerCommandLine.next();
-          }
           if (scannerCommandLine.hasNext()) {
             currency = scannerCommandLine.next().toUpperCase();
           }
@@ -319,16 +311,16 @@ class FinCalc {
             amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
           }
 
-          if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
+          if (currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
             if (currency.equals("USD")) {
-              changeBalance(username, amount, true);
-              System.out.println("Deposited " + amount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD into the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
+              changeBalance(loginUsername, amount, true);
+              System.out.println("Deposited " + amount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD into the your account. Your new balance is " + accounts.get(getAccount(loginUsername, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
             }
             else {
               BigDecimal convertedAmount = convert(currency, "USD", amount);
               if (convertedAmount.compareTo(BigDecimal.ZERO) > 0) {
-                changeBalance(username, convertedAmount, true);
-                System.out.println("Deposited " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD into the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
+                changeBalance(loginUsername, convertedAmount, true);
+                System.out.println("Deposited " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD into your account. Your new balance is " + accounts.get(getAccount(loginUsername, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
               }
               else {
                 System.out.println("No conversion data to USD. Please enter conversion data first.");
@@ -341,13 +333,9 @@ class FinCalc {
           }
         }
         else if (command.toLowerCase().equals("withdraw")) {
-          String username = "";
           String currency = "";
           BigDecimal amount = BigDecimal.ZERO;
 
-          if (scannerCommandLine.hasNext()) {
-            username = scannerCommandLine.next();
-          }
           if (scannerCommandLine.hasNext()) {
             currency = scannerCommandLine.next().toUpperCase();
           }
@@ -358,10 +346,10 @@ class FinCalc {
             amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
           }
 
-          if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
+          if (currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
             if (currency.equals("USD")) {
-              if (changeBalance(username, amount, false)) {
-                System.out.println("Withdrew " + amount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD from the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
+              if (changeBalance(loginUsername, amount, false)) {
+                System.out.println("Withdrew " + amount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD from your account. Your new balance is " + accounts.get(getAccount(loginUsername, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
               }
               else {
                 System.out.println("Insufficient funds.");
@@ -370,8 +358,8 @@ class FinCalc {
             else {
               BigDecimal convertedAmount = convert(currency, "USD", amount);
               if (convertedAmount.compareTo(BigDecimal.ZERO) > 0) {
-                if (changeBalance(username, convertedAmount, false)) {
-                  System.out.println("Withdrew " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD from the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
+                if (changeBalance(loginUsername, convertedAmount, false)) {
+                  System.out.println("Withdrew " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD from your account. Your new balance is " + accounts.get(getAccount(loginUsername, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
                 }
                 else {
                   System.out.println("Insufficient funds.");
@@ -405,7 +393,7 @@ class FinCalc {
             amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
           }
 
-          if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
+          if (getAccount(username, accounts) >= 0 && currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
 
           }
           else {
@@ -475,14 +463,14 @@ class FinCalc {
     if (deposit) {
       BigDecimal newBalance = accounts.get(accountIndex).getBalance().add(amount);
       accounts.get(accountIndex).setBalance(newBalance);
-      updateAccountData(username, newBalance);
+      updateAccountBalance(username, newBalance);
       return true;
     }
     else {
       BigDecimal newBalance = accounts.get(accountIndex).getBalance().subtract(amount);
       if (newBalance.compareTo(BigDecimal.ZERO) >= 0) {
         accounts.get(accountIndex).setBalance(newBalance);
-        updateAccountData(username, newBalance);
+        updateAccountBalance(username, newBalance);
         return true;
       }
       else {
@@ -491,11 +479,11 @@ class FinCalc {
     }
   }
 
-  // Adds a new account to the text file
-  private void saveNewAccountData(String username, BigDecimal balance) {
+  // Adds a new account to the text file with balance 0
+  private void saveNewAccount(String username, String salt, String password, String preferredCurrency) {
     try {
       FileWriter fileWriter = new FileWriter(new File("account.txt"), true);
-      fileWriter.write(username + " " + balance + "\n");
+      fileWriter.write(username + " " + salt + " " + password + " " + preferredCurrency + " " + 0 + "\n");
       fileWriter.close();
     }
     catch (Exception e) {
@@ -505,20 +493,20 @@ class FinCalc {
 
   // Updates the account balance of an existing account in the text file
   // Does this by creating a temporary file, copying all lines except the one with the specified username, changing the balance for that line, deleting the old file and renaming the new file to the old file
-  private void updateAccountData(String username, BigDecimal balance) {
+  private void updateAccountBalance(String username, BigDecimal balance) {
     try {
       File oldAccount = new File("account.txt");
       File newAccount = new File("temp");
       Scanner scanner = new Scanner(oldAccount);
       FileWriter fileWriter = new FileWriter(newAccount);
       while (scanner.hasNextLine()){
-        String line = scanner.nextLine() + "\n";
-        String scannedUsername = new Scanner(line).next();
-        if (scannedUsername.equals(username)) {
-          fileWriter.write(username + " " + balance + "\n");
+        String line = scanner.nextLine();
+        String[] lineItems = line.split(" ");
+        if (lineItems[0].equals(username)) {
+          fileWriter.write(username + " " + lineItems[1] + " " + lineItems[2] + " " + lineItems[3] + " " + balance + "\n");
         }
         else {
-          fileWriter.write(line);
+          fileWriter.write(line + "\n");
         }
       }
       fileWriter.close();
