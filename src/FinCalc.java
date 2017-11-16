@@ -40,7 +40,7 @@ class FinCalc {
     }
   }
 
-  // Loads usernames and balances into ArrayList
+  // Loads account information into ArrayList
   private void loadAccountData() {
     try {
       File file = new File("account.txt");
@@ -49,7 +49,7 @@ class FinCalc {
         while (fileReader.hasNextLine()) {
           String line = fileReader.nextLine();
           Scanner lineScanner = new Scanner(line);
-          Account account = new Account(lineScanner.next(), new BigDecimal(lineScanner.next()));
+          Account account = new Account(lineScanner.next(), lineScanner.next(), lineScanner.next(), lineScanner.next(), new BigDecimal(lineScanner.next()));
           accounts.add(account);
         }
         fileReader.close();
@@ -90,6 +90,7 @@ class FinCalc {
     return bytesToHex(salt);
   }
 
+  // Authenticates a username-password pair
   private boolean authenticate(String username, String password) {
     return true;
   }
@@ -99,8 +100,8 @@ class FinCalc {
     boolean running = true;
     boolean authenticated = false;
     Scanner scanner = new Scanner(System.in);
-
     String usernameInput = "";
+
     while (!authenticated) {
       System.out.print("Please enter your username: ");
       usernameInput = scanner.nextLine();
@@ -471,34 +472,21 @@ class FinCalc {
   // Changes the balance of the account with the specified username, returns true or false depending on whether the change succeeded
   private boolean changeBalance(String username, BigDecimal amount, boolean deposit) {
     int accountIndex = getAccount(username, accounts);
-    if (accountIndex == -1) {
-      if (deposit) {
-        Account account = new Account(username, amount);
-        accounts.add(account);
-        saveNewAccountData(username, amount);
-        return true;
-      }
-      else {
-        return false;
-      }
+    if (deposit) {
+      BigDecimal newBalance = accounts.get(accountIndex).getBalance().add(amount);
+      accounts.get(accountIndex).setBalance(newBalance);
+      updateAccountData(username, newBalance);
+      return true;
     }
     else {
-      if (deposit) {
-        BigDecimal newBalance = accounts.get(accountIndex).getBalance().add(amount);
+      BigDecimal newBalance = accounts.get(accountIndex).getBalance().subtract(amount);
+      if (newBalance.compareTo(BigDecimal.ZERO) >= 0) {
         accounts.get(accountIndex).setBalance(newBalance);
         updateAccountData(username, newBalance);
         return true;
       }
       else {
-        BigDecimal newBalance = accounts.get(accountIndex).getBalance().subtract(amount);
-        if (newBalance.compareTo(BigDecimal.ZERO) >= 0) {
-          accounts.get(accountIndex).setBalance(newBalance);
-          updateAccountData(username, newBalance);
-          return true;
-        }
-        else {
-          return false;
-        }
+        return false;
       }
     }
   }
