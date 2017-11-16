@@ -90,203 +90,348 @@ class FinCalc {
     return bytesToHex(salt);
   }
 
+  private boolean authenticate(String username, String password) {
+    return true;
+  }
+
   // Runs the command line application
   void run() {
     boolean running = true;
+    boolean authenticated = false;
     Scanner scanner = new Scanner(System.in);
 
-    System.out.println("FinCalc 2.0");
-    System.out.println("Type 'help' for a list of commands.");
-
-    while (running) {
-      System.out.print(">> ");
-
-      String commandLine = scanner.nextLine();
-      Scanner scannerCommandLine = new Scanner(commandLine);
-      String command = scannerCommandLine.next();
-
-      if (command.toUpperCase().equals("MAINT")) {
-        String currency1 = "";
-        String currency2 = "";
-        BigDecimal conversionRate = BigDecimal.ZERO;
-
-        if (scannerCommandLine.hasNext()) {
-          currency1 = scannerCommandLine.next().toUpperCase();
-        }
-        if (scannerCommandLine.hasNext()) {
-          currency2 = scannerCommandLine.next().toUpperCase();
-        }
-        if (scannerCommandLine.hasNextBigDecimal()) {
-          conversionRate = scannerCommandLine.nextBigDecimal();
-        }
-
-        if (currency1.matches("^[a-zA-Z]{3}$") && currency2.matches("^[a-zA-Z]{3}$") && conversionRate.compareTo(BigDecimal.ZERO) > 0) {
-          boolean boolVerified = false;
-
-          System.out.println(currency1 + "/" + currency2 + "=" + conversionRate);
-          System.out.print("Would you like to save this currency conversion data in the database? (y/n): ");
-
-          while (!boolVerified) {
-            command = scanner.nextLine();
-            switch (command) {
-              case "y":
-                boolVerified = true;
-                CurrencyPair currencyPair = new CurrencyPair(currency1, currency2, conversionRate);
-                if (getCurrencyPair(currencyPair, currencyPairs) == -1) {
-                  saveCurrencyData(currency1, currency2, conversionRate);
-                  currencyPairs.add(currencyPair);
-                  System.out.println("Currency pair saved.");
-                }
-                else {
-                  System.out.println("Saving failed. Currency pair already exists.");
-                }
-                break;
-              case "n":
-                boolVerified = true;
-                System.out.println("Saving canceled.");
-                break;
-              default:
-                System.out.println("Please enter 'y' for yes or 'n' for no.");
-            }
-          }
-        }
-        else {
-          System.out.println("Please enter valid arguments for MAINT:");
-          System.out.println("MAINT [currency 1] [currency 2] [conversion rate]");
-        }
+    String usernameInput = "";
+    while (!authenticated) {
+      System.out.print("Please enter your username: ");
+      usernameInput = scanner.nextLine();
+      System.out.print("Please enter your password: ");
+      String passwordInput = scanner.nextLine();
+      if (authenticate(usernameInput, passwordInput)) {
+        authenticated = true;
       }
-      else if (command.toLowerCase().equals("deposit")) {
-        String username = "";
-        String currency = "";
-        BigDecimal amount = BigDecimal.ZERO;
+      else {
+        System.out.println("Incorrect username or password. Please try again.");
+      }
+    }
 
-        if (scannerCommandLine.hasNext()) {
-          username = scannerCommandLine.next();
-        }
-        if (scannerCommandLine.hasNext()) {
-          currency = scannerCommandLine.next().toUpperCase();
-        }
-        if (scannerCommandLine.hasNextBigDecimal()) {
-          amount = scannerCommandLine.nextBigDecimal();
-        }
-        else if (scannerCommandLine.hasNext()) {
-          amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
-        }
+    if (usernameInput.equals("admin")) {
+      admin = true;
+    }
 
-        if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[a-zA-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
-          if (currency.equals("USD")) {
-            changeBalance(username, amount, true);
-            System.out.println("Deposited " + amount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD into the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
+    if (admin) {
+      System.out.println("FinCalc 2.0 - ADMIN");
+      System.out.println("Type 'help' for a list of commands.");
+
+      while (running) {
+        System.out.print(">> ");
+
+        String commandLine = scanner.nextLine();
+        Scanner scannerCommandLine = new Scanner(commandLine);
+        String command = scannerCommandLine.next();
+
+        if (command.toUpperCase().equals("ADDUSER")) {
+          String username = "";
+          String password = "";
+          String preferredCurrency = "";
+
+          if (scannerCommandLine.hasNext()) {
+            username = scannerCommandLine.next();
+          }
+          if (scannerCommandLine.hasNext()) {
+            password = scannerCommandLine.next();
+          }
+          if (scannerCommandLine.hasNext()) {
+            preferredCurrency = scannerCommandLine.next().toUpperCase();
+          }
+
+          if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && password.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && preferredCurrency.matches("^[A-Z]{3}$")) {
+
           }
           else {
-            BigDecimal convertedAmount = convert(currency, "USD", amount);
-            if (convertedAmount.compareTo(BigDecimal.ZERO) > 0) {
-              changeBalance(username, convertedAmount, true);
-              System.out.println("Deposited " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD into the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
-            }
-            else {
-              System.out.println("No conversion data to USD. Please enter conversion data first.");
-            }
+            System.out.println("Please enter valid arguments for ADDUSER:");
+            System.out.println("ADDUSER [username] [password] [preferred currency]");
           }
         }
+          else if (command.toUpperCase().equals("DELUSER")) {
+          String username = "";
+
+          if (scannerCommandLine.hasNext()) {
+            username = scannerCommandLine.next();
+          }
+
+          if (getAccount(username, accounts) >= 0) {
+
+          }
+          else {
+            System.out.println("Please enter valid arguments for DELUSER:");
+            System.out.println("DELUSER [username]");
+          }
+        }
+        else if (command.toUpperCase().equals("ADD")) {
+          String username = "";
+          String currency = "";
+          BigDecimal amount = BigDecimal.ZERO;
+
+          if (scannerCommandLine.hasNext()) {
+            username = scannerCommandLine.next();
+          }
+          if (scannerCommandLine.hasNext()) {
+            currency = scannerCommandLine.next().toUpperCase();
+          }
+          if (scannerCommandLine.hasNextBigDecimal()) {
+            amount = scannerCommandLine.nextBigDecimal();
+          }
+          else if (scannerCommandLine.hasNext()) {
+            amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
+          }
+
+          if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
+
+          }
+          else {
+            System.out.println("Please enter valid arguments for ADD:");
+            System.out.println("ADD [username] [currency] [amount]");
+          }
+        }
+        else if (command.toUpperCase().equals("SUB")) {
+          String username = "";
+          String currency = "";
+          BigDecimal amount = BigDecimal.ZERO;
+
+          if (scannerCommandLine.hasNext()) {
+            username = scannerCommandLine.next();
+          }
+          if (scannerCommandLine.hasNext()) {
+            currency = scannerCommandLine.next().toUpperCase();
+          }
+          if (scannerCommandLine.hasNextBigDecimal()) {
+            amount = scannerCommandLine.nextBigDecimal();
+          }
+          else if (scannerCommandLine.hasNext()) {
+            amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
+          }
+
+          if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
+
+          }
+          else {
+            System.out.println("Please enter valid arguments for SUB:");
+            System.out.println("SUB [username] [currency] [amount]");
+          }
+        }
+        else if (command.toLowerCase().equals("help")) {
+          System.out.println("Use ISO Codes for currencies, e.g. USD, EUR, JPY");
+          System.out.println("Conversion rate is the number of units of currency 2 that are equal to one unit of currency 1");
+          System.out.println();
+          System.out.println("LIST OF COMMANDS:");
+          System.out.println("ADDUSER [username] [password] [preferred currency] - Add a new account with username <username> and password <password> and set the preferred currency");
+          System.out.println("DELUSER [username] - Delete account with username <username>");
+          System.out.println("ADD [username] [currency] [amount] - Add <amount> in <currency> to account with username <username>");
+          System.out.println("SUB [username] [currency] [amount] - Remove <amount> in <currency> from account with username <username>");
+          System.out.println("quit - Exit the program");
+        }
+        else if (command.toLowerCase().equals("quit")) {
+          running = false;
+        }
         else {
-          System.out.println("Please enter valid arguments for deposit:");
-          System.out.println("deposit [username] [currency] [amount]");
+          System.out.println("Please enter a valid command. Type 'help' for a list of commands.");
         }
+        scannerCommandLine.close();
       }
-      else if (command.toLowerCase().equals("withdraw")) {
-        String username = "";
-        String currency = "";
-        BigDecimal amount = BigDecimal.ZERO;
+    }
+    else {
+      System.out.println("FinCalc 2.0");
+      System.out.println("Type 'help' for a list of commands.");
 
-        if (scannerCommandLine.hasNext()) {
-          username = scannerCommandLine.next();
-        }
-        if (scannerCommandLine.hasNext()) {
-          currency = scannerCommandLine.next().toUpperCase();
-        }
-        if (scannerCommandLine.hasNextBigDecimal()) {
-          amount = scannerCommandLine.nextBigDecimal();
-        }
-        else if (scannerCommandLine.hasNext()) {
-          amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
-        }
+      while (running) {
+        System.out.print(">> ");
 
-        if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[a-zA-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
-          if (currency.equals("USD")) {
-            if (changeBalance(username, amount, false)) {
-              System.out.println("Withdrew " + amount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD from the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
-            }
-            else {
-              System.out.println("Insufficient funds.");
+        String commandLine = scanner.nextLine();
+        Scanner scannerCommandLine = new Scanner(commandLine);
+        String command = scannerCommandLine.next();
+
+        if (command.toUpperCase().equals("MAINT")) {
+          String currency1 = "";
+          String currency2 = "";
+          BigDecimal conversionRate = BigDecimal.ZERO;
+
+          if (scannerCommandLine.hasNext()) {
+            currency1 = scannerCommandLine.next().toUpperCase();
+          }
+          if (scannerCommandLine.hasNext()) {
+            currency2 = scannerCommandLine.next().toUpperCase();
+          }
+          if (scannerCommandLine.hasNextBigDecimal()) {
+            conversionRate = scannerCommandLine.nextBigDecimal();
+          }
+
+          if (currency1.matches("^[A-Z]{3}$") && currency2.matches("^[A-Z]{3}$") && conversionRate.compareTo(BigDecimal.ZERO) > 0) {
+            boolean boolVerified = false;
+
+            System.out.println(currency1 + "/" + currency2 + "=" + conversionRate);
+            System.out.print("Would you like to save this currency conversion data in the database? (y/n): ");
+
+            while (!boolVerified) {
+              command = scanner.nextLine();
+              switch (command) {
+                case "y":
+                  boolVerified = true;
+                  CurrencyPair currencyPair = new CurrencyPair(currency1, currency2, conversionRate);
+                  if (getCurrencyPair(currencyPair, currencyPairs) == -1) {
+                    saveCurrencyData(currency1, currency2, conversionRate);
+                    currencyPairs.add(currencyPair);
+                    System.out.println("Currency pair saved.");
+                  }
+                  else {
+                    System.out.println("Saving failed. Currency pair already exists.");
+                  }
+                  break;
+                case "n":
+                  boolVerified = true;
+                  System.out.println("Saving canceled.");
+                  break;
+                default:
+                  System.out.println("Please enter 'y' for yes or 'n' for no.");
+              }
             }
           }
           else {
-            BigDecimal convertedAmount = convert(currency, "USD", amount);
-            if (convertedAmount.compareTo(BigDecimal.ZERO) > 0) {
-              if (changeBalance(username, convertedAmount, false)) {
-                System.out.println("Withdrew " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD from the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
+            System.out.println("Please enter valid arguments for MAINT:");
+            System.out.println("MAINT [currency 1] [currency 2] [conversion rate]");
+          }
+        }
+        else if (command.toLowerCase().equals("deposit")) {
+          String username = "";
+          String currency = "";
+          BigDecimal amount = BigDecimal.ZERO;
+
+          if (scannerCommandLine.hasNext()) {
+            username = scannerCommandLine.next();
+          }
+          if (scannerCommandLine.hasNext()) {
+            currency = scannerCommandLine.next().toUpperCase();
+          }
+          if (scannerCommandLine.hasNextBigDecimal()) {
+            amount = scannerCommandLine.nextBigDecimal();
+          }
+          else if (scannerCommandLine.hasNext()) {
+            amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
+          }
+
+          if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
+            if (currency.equals("USD")) {
+              changeBalance(username, amount, true);
+              System.out.println("Deposited " + amount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD into the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
+            }
+            else {
+              BigDecimal convertedAmount = convert(currency, "USD", amount);
+              if (convertedAmount.compareTo(BigDecimal.ZERO) > 0) {
+                changeBalance(username, convertedAmount, true);
+                System.out.println("Deposited " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD into the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
+              }
+              else {
+                System.out.println("No conversion data to USD. Please enter conversion data first.");
+              }
+            }
+          }
+          else {
+            System.out.println("Please enter valid arguments for deposit:");
+            System.out.println("deposit [username] [currency] [amount]");
+          }
+        }
+        else if (command.toLowerCase().equals("withdraw")) {
+          String username = "";
+          String currency = "";
+          BigDecimal amount = BigDecimal.ZERO;
+
+          if (scannerCommandLine.hasNext()) {
+            username = scannerCommandLine.next();
+          }
+          if (scannerCommandLine.hasNext()) {
+            currency = scannerCommandLine.next().toUpperCase();
+          }
+          if (scannerCommandLine.hasNextBigDecimal()) {
+            amount = scannerCommandLine.nextBigDecimal();
+          }
+          else if (scannerCommandLine.hasNext()) {
+            amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
+          }
+
+          if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
+            if (currency.equals("USD")) {
+              if (changeBalance(username, amount, false)) {
+                System.out.println("Withdrew " + amount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD from the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
               }
               else {
                 System.out.println("Insufficient funds.");
               }
             }
             else {
-              System.out.println("No conversion data to USD. Please enter conversion data first.");
+              BigDecimal convertedAmount = convert(currency, "USD", amount);
+              if (convertedAmount.compareTo(BigDecimal.ZERO) > 0) {
+                if (changeBalance(username, convertedAmount, false)) {
+                  System.out.println("Withdrew " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD from the account of " + username + ". Your new balance is " + accounts.get(getAccount(username, accounts)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " USD.");
+                }
+                else {
+                  System.out.println("Insufficient funds.");
+                }
+              }
+              else {
+                System.out.println("No conversion data to USD. Please enter conversion data first.");
+              }
             }
           }
+          else {
+            System.out.println("Please enter valid arguments for withdraw:");
+            System.out.println("withdraw [username] [currency] [amount]");
+          }
+        }
+        else if (command.toLowerCase().equals("transfer")) {
+          String username = "";
+          String currency = "";
+          BigDecimal amount = BigDecimal.ZERO;
+
+          if (scannerCommandLine.hasNext()) {
+            username = scannerCommandLine.next();
+          }
+          if (scannerCommandLine.hasNext()) {
+            currency = scannerCommandLine.next().toUpperCase();
+          }
+          if (scannerCommandLine.hasNextBigDecimal()) {
+            amount = scannerCommandLine.nextBigDecimal();
+          }
+          else if (scannerCommandLine.hasNext()) {
+            amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
+          }
+
+          if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
+
+          }
+          else {
+            System.out.println("Please enter valid arguments for transfer:");
+            System.out.println("transfer [username] [currency] [amount]");
+          }
+        }
+        else if (command.toLowerCase().equals("help")) {
+          System.out.println("Use ISO Codes for currencies, e.g. USD, EUR, JPY");
+          System.out.println("Conversion rate is the number of units of currency 2 that are equal to one unit of currency 1");
+          System.out.println();
+          System.out.println("LIST OF COMMANDS:");
+          System.out.println("MAINT [currency 1] [currency 2] [conversion rate] - Enter currency conversion data");
+          System.out.println("deposit [username] [currency] [amount] - Deposit <amount> in <currency> into account with username <username>");
+          System.out.println("withdraw [username] [currency] [amount] - Withdraw <amount> in <currency> from account with username <username>");
+          System.out.println("transfer [username] [currency] [amount] - Transfer <amount> in <currency> to account with username <username>");
+          System.out.println("quit - Exit the program");
+        }
+        else if (command.toLowerCase().equals("quit")) {
+          running = false;
         }
         else {
-          System.out.println("Please enter valid arguments for withdraw:");
-          System.out.println("withdraw [username] [currency] [amount]");
+          System.out.println("Please enter a valid command. Type 'help' for a list of commands.");
         }
+        scannerCommandLine.close();
       }
-      else if (command.toLowerCase().equals("transfer")) {
-        String username = "";
-        String currency = "";
-        BigDecimal amount = BigDecimal.ZERO;
-
-        if (scannerCommandLine.hasNext()) {
-          username = scannerCommandLine.next();
-        }
-        if (scannerCommandLine.hasNext()) {
-          currency = scannerCommandLine.next().toUpperCase();
-        }
-        if (scannerCommandLine.hasNextBigDecimal()) {
-          amount = scannerCommandLine.nextBigDecimal();
-        }
-        else if (scannerCommandLine.hasNext()) {
-          amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
-        }
-
-        if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[a-zA-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
-
-        }
-        else {
-          System.out.println("Please enter valid arguments for transfer:");
-          System.out.println("transfer [username] [currency] [amount]");
-        }
-      }
-      else if (command.toLowerCase().equals("help")) {
-        System.out.println("Use ISO Codes for currencies, e.g. USD, EUR, JPY");
-        System.out.println("Conversion rate is the number of units of currency 2 that are equal to one unit of currency 1");
-        System.out.println();
-        System.out.println("LIST OF COMMANDS:");
-        System.out.println("MAINT [currency 1] [currency 2] [conversion rate] - Enter currency conversion data");
-        System.out.println("deposit [username] [currency] [amount] - Deposit <amount> in <currency> into account with username <username>");
-        System.out.println("withdraw [username] [currency] [amount] - Withdraw <amount> in <currency> from account with username <username>");
-        System.out.println("transfer [username] [currency] [amount] - Transfer <amount> in <currency> to account with username <username>");
-        System.out.println("quit - Exit the program");
-      }
-      else if (command.toLowerCase().equals("quit")) {
-        running = false;
-      }
-      else {
-        System.out.println("Please enter a valid command. Type 'help' for a list of commands.");
-      }
-      scannerCommandLine.close();
     }
-
     scanner.close();
     System.out.println("Goodbye.");
   }
