@@ -1,5 +1,4 @@
 import java.math.*;
-import java.nio.charset.Charset;
 import java.util.*;
 import java.io.*;
 import java.security.*;
@@ -8,14 +7,12 @@ class FinCalc {
   private ArrayList<CurrencyPair> currencyPairs;
   private ArrayList<Account> accounts;
   private MathContext mathContext;
-  private boolean admin;
 
   // Initializes variables and calls the functions for loading data
   FinCalc() {
     currencyPairs = new ArrayList<>();
     accounts = new ArrayList<>();
     mathContext = new MathContext(2);
-    admin = false;
     loadCurrencyData();
     loadAccountData();
   }
@@ -141,7 +138,7 @@ class FinCalc {
             preferredCurrency = scannerCommandLine.next().toUpperCase();
           }
 
-          if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && password.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && preferredCurrency.matches("^[A-Z]{3}$")) {
+          if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && password.matches("^[a-zA-Z0-9]{8,}$") && preferredCurrency.matches("^[A-Z]{3}$")) {
 
           }
           else {
