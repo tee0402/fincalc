@@ -21,13 +21,12 @@ class FinCalc {
   private void loadCurrencyData() {
     try {
       File file = new File("currency.txt");
-      if (file.exists()){
+      if (file.exists()) {
         Scanner fileReader = new Scanner(file);
         while (fileReader.hasNextLine()) {
           String line = fileReader.nextLine();
           Scanner lineScanner = new Scanner(line);
-          CurrencyPair currencyPair = new CurrencyPair(lineScanner.next(), lineScanner.next(), new BigDecimal(lineScanner.next()));
-          currencyPairs.add(currencyPair);
+          currencyPairs.add(new CurrencyPair(lineScanner.next(), lineScanner.next(), new BigDecimal(lineScanner.next())));
         }
         fileReader.close();
       }
@@ -41,7 +40,7 @@ class FinCalc {
   private void loadAccountData() {
     try {
       File file = new File("account.txt");
-      if (file.exists()){
+      if (file.exists()) {
         Scanner fileReader = new Scanner(file);
         while (fileReader.hasNextLine()) {
           String line = fileReader.nextLine();
