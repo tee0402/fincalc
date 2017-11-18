@@ -103,6 +103,7 @@ class FinCalc {
     Scanner scanner = new Scanner(System.in);
     String loginUsername = "";
 
+    // Login phase
     while (!authenticated) {
       System.out.print("Please enter your username: ");
       loginUsername = scanner.nextLine();
@@ -116,6 +117,7 @@ class FinCalc {
       }
     }
 
+    // Admin program
     if (loginUsername.equals("admin")) {
       System.out.println("FinCalc 2.0 - ADMIN");
       System.out.println("Type 'help' for a list of commands.");
@@ -141,34 +143,44 @@ class FinCalc {
           if (scannerCommandLine.hasNextBigDecimal()) {
             conversionRate = scannerCommandLine.nextBigDecimal();
           }
+          else if (scannerCommandLine.hasNext()) {
+            String conversionRateInput = scannerCommandLine.next().replaceAll("[^0-9.]", "");
+            if (conversionRateInput.matches("^[0-9.]$")) {
+              conversionRate = new BigDecimal(conversionRateInput);
+            }
+          }
 
           if (currency1.matches("^[A-Z]{3}$") && currency2.matches("^[A-Z]{3}$") && conversionRate.compareTo(BigDecimal.ZERO) > 0) {
-            boolean boolVerified = false;
+            if (currency1.equals(currency2)) {
+              System.out.println("Currency 1 and currency 2 must be different.");
+            }
+            else {
+              boolean boolVerified = false;
 
-            System.out.println(currency1 + "/" + currency2 + "=" + conversionRate);
-            System.out.print("Would you like to save this currency conversion data in the database? (y/n): ");
+              System.out.println(currency1 + "/" + currency2 + "=" + conversionRate);
+              System.out.print("Would you like to save this currency conversion data in the database? (y/n): ");
 
-            while (!boolVerified) {
-              command = scanner.nextLine();
-              switch (command) {
-                case "y":
-                  boolVerified = true;
-                  CurrencyPair currencyPair = new CurrencyPair(currency1, currency2, conversionRate);
-                  if (getCurrencyPair(currencyPair) == -1) {
-                    saveCurrencyData(currency1, currency2, conversionRate);
-                    currencyPairs.add(currencyPair);
-                    System.out.println("Currency pair saved.");
-                  }
-                  else {
-                    System.out.println("Saving failed. Currency pair already exists.");
-                  }
-                  break;
-                case "n":
-                  boolVerified = true;
-                  System.out.println("Saving canceled.");
-                  break;
-                default:
-                  System.out.println("Please enter 'y' for yes or 'n' for no.");
+              while (!boolVerified) {
+                command = scanner.nextLine();
+                switch (command) {
+                  case "y":
+                    boolVerified = true;
+                    CurrencyPair currencyPair = new CurrencyPair(currency1, currency2, conversionRate);
+                    if (getCurrencyPair(currencyPair) == -1) {
+                      saveCurrencyData(currency1, currency2, conversionRate);
+                      currencyPairs.add(currencyPair);
+                      System.out.println("Currency pair saved.");
+                    } else {
+                      System.out.println("Saving failed. Currency pair already exists.");
+                    }
+                    break;
+                  case "n":
+                    boolVerified = true;
+                    System.out.println("Saving canceled.");
+                    break;
+                  default:
+                    System.out.print("Please enter 'y' for yes or 'n' for no: ");
+                }
               }
             }
           }
@@ -214,7 +226,7 @@ class FinCalc {
 
           if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$")) {
             if (deleteAccount(username)) {
-              System.out.println("Account successfully deleted.");
+              System.out.println("Account deleted successfully.");
             }
             else {
               System.out.println("Account does not exist.");
@@ -240,25 +252,22 @@ class FinCalc {
             amount = scannerCommandLine.nextBigDecimal();
           }
           else if (scannerCommandLine.hasNext()) {
-            amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
+            String amountInput = scannerCommandLine.next().replaceAll("[^0-9.]", "");
+            if (amountInput.matches("^[0-9.]$")) {
+              amount = new BigDecimal(amountInput);
+            }
           }
 
           if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
             if (getAccount(username) >= 0) {
               String preferredCurrency = accounts.get(getAccount(username)).getPreferredCurrency();
-              if (currency.equals(preferredCurrency)) {
-                changeBalance(username, amount, true);
-                System.out.println("Added " + amount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + preferredCurrency + " to the account of " + username + ". Its new balance is " + accounts.get(getAccount(username)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + preferredCurrency + ".");
+              BigDecimal convertedAmount = convert(currency, preferredCurrency, amount);
+              if (convertedAmount.compareTo(BigDecimal.ZERO) > 0) {
+                changeBalance(username, convertedAmount, true);
+                System.out.println("Added " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + preferredCurrency + " to the account of " + username + ". Its new balance is " + accounts.get(getAccount(username)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + preferredCurrency + ".");
               }
               else {
-                BigDecimal convertedAmount = convert(currency, accounts.get(getAccount(username)).getPreferredCurrency(), amount);
-                if (convertedAmount.compareTo(BigDecimal.ZERO) > 0) {
-                  changeBalance(username, convertedAmount, true);
-                  System.out.println("Added " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + preferredCurrency + " to the account of " + username + ". Its new balance is " + accounts.get(getAccount(username)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + preferredCurrency + ".");
-                }
-                else {
-                  System.out.println("No conversion data to " + preferredCurrency + ". Please enter conversion data first.");
-                }
+                System.out.println("No conversion data to " + preferredCurrency + ". Please enter conversion data first.");
               }
             }
             else {
@@ -285,33 +294,26 @@ class FinCalc {
             amount = scannerCommandLine.nextBigDecimal();
           }
           else if (scannerCommandLine.hasNext()) {
-            amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
+            String amountInput = scannerCommandLine.next().replaceAll("[^0-9.]", "");
+            if (amountInput.matches("^[0-9.]$")) {
+              amount = new BigDecimal(amountInput);
+            }
           }
 
           if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
             if (getAccount(username) >= 0) {
               String preferredCurrency = accounts.get(getAccount(username)).getPreferredCurrency();
-              if (currency.equals(preferredCurrency)) {
-                if (changeBalance(username, amount, false)) {
-                  System.out.println("Removed " + amount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + preferredCurrency + " from the account of " + username + ". Its new balance is " + accounts.get(getAccount(username)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + preferredCurrency + ".");
+              BigDecimal convertedAmount = convert(currency, preferredCurrency, amount);
+              if (convertedAmount.compareTo(BigDecimal.ZERO) > 0) {
+                if (changeBalance(username, convertedAmount, false)) {
+                  System.out.println("Removed " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + preferredCurrency + " from the account of " + username + ". Its new balance is " + accounts.get(getAccount(username)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + preferredCurrency + ".");
                 }
                 else {
                   System.out.println("Insufficient funds.");
                 }
               }
               else {
-                BigDecimal convertedAmount = convert(currency, accounts.get(getAccount(username)).getPreferredCurrency(), amount);
-                if (convertedAmount.compareTo(BigDecimal.ZERO) > 0) {
-                  if (changeBalance(username, convertedAmount, false)) {
-                    System.out.println("Removed " + convertedAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + preferredCurrency + " from the account of " + username + ". Its new balance is " + accounts.get(getAccount(username)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + preferredCurrency + ".");
-                  }
-                  else {
-                    System.out.println("Insufficient funds.");
-                  }
-                }
-                else {
-                  System.out.println("No conversion data to " + preferredCurrency + ". Please enter conversion data first.");
-                }
+                System.out.println("No conversion data to " + preferredCurrency + ". Please enter conversion data first.");
               }
             }
             else {
@@ -344,6 +346,7 @@ class FinCalc {
         scannerCommandLine.close();
       }
     }
+    // Normal user program
     else {
       System.out.println("FinCalc 2.0");
       System.out.println("Type 'help' for a list of commands.");
@@ -370,7 +373,10 @@ class FinCalc {
             amount = scannerCommandLine.nextBigDecimal();
           }
           else if (scannerCommandLine.hasNext()) {
-            amount = new BigDecimal(scannerCommandLine.next().replaceAll("[^0-9.]", ""));
+            String amountInput = scannerCommandLine.next().replaceAll("[^0-9.]", "");
+            if (amountInput.matches("^[0-9.]$")) {
+              amount = new BigDecimal(amountInput);
+            }
           }
 
           if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
@@ -388,7 +394,7 @@ class FinCalc {
               else {
                 if (changeBalance(loginUsername, convertedSourceAmount, false)) {
                   changeBalance(username, convertedDestinationAmount, true);
-                  System.out.println("Transferred " + convertedDestinationAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + destinationPreferredCurrency + " from your account to the account of " + username + ". Its new balance is " + accounts.get(getAccount(username)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + destinationPreferredCurrency + ".");
+                  System.out.println("Transferred " + convertedSourceAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + sourcePreferredCurrency + "/" + convertedDestinationAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + destinationPreferredCurrency + " from your account to the account of " + username + ". Your new balance is " + accounts.get(getAccount(loginUsername)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + sourcePreferredCurrency + ". Its new balance is " + accounts.get(getAccount(username)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + destinationPreferredCurrency + ".");
                 }
                 else {
                   System.out.println("Insufficient funds.");
@@ -457,19 +463,20 @@ class FinCalc {
     return -1;
   }
 
-  // Adds a new account to the text file with balance 0
+  // Adds a new account with balance 0 to the text file and ArrayList
   private boolean saveNewAccount(String username, String password, String preferredCurrency) {
     try {
-      String salt = salt();
-      if (getAccount(username) == -1) {
-        FileWriter fileWriter = new FileWriter(new File("account.txt"), true);
-        fileWriter.write(username + " " + salt + " " + hash(salt + password) + " " + preferredCurrency + " " + 0 + "\n");
-        fileWriter.close();
-        accounts.add(new Account(username, salt, password, preferredCurrency, BigDecimal.ZERO));
-        return true;
+      if (getAccount(username) >=  0) {
+        return false;
       }
       else {
-        return false;
+        FileWriter fileWriter = new FileWriter(new File("account.txt"), true);
+        String salt = salt();
+        String hash = hash(salt + password);
+        fileWriter.write(username + " " + salt + " " + hash + " " + preferredCurrency + " " + 0 + "\n");
+        fileWriter.close();
+        accounts.add(new Account(username, salt, hash, preferredCurrency, BigDecimal.ZERO));
+        return true;
       }
     }
     catch (Exception e) {
