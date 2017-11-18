@@ -35,6 +35,7 @@ Currency pair saved.
 >> transfer john12 eur 50
 Transferred 59.00 USD/6610.00 JPY from your account to the account of john12. Your new balance is 40.17 USD. Their new balance is 6610.00 JPY.
 ```
+
 ---
 
 # FinCalc 1.0
