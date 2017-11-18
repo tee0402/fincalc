@@ -381,8 +381,8 @@ class FinCalc {
 
           if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
             if (getAccount(username) >= 0) {
-              String sourcePreferredCurrency = accounts.get(getAccount(username)).getPreferredCurrency();
-              String destinationPreferredCurrency = accounts.get(getAccount(loginUsername)).getPreferredCurrency();
+              String sourcePreferredCurrency = accounts.get(getAccount(loginUsername)).getPreferredCurrency();
+              String destinationPreferredCurrency = accounts.get(getAccount(username)).getPreferredCurrency();
               BigDecimal convertedSourceAmount = convert(currency, sourcePreferredCurrency, amount);
               BigDecimal convertedDestinationAmount = convert(currency, destinationPreferredCurrency, amount);
               if (convertedSourceAmount.compareTo(BigDecimal.ZERO) <= 0) {
@@ -394,7 +394,7 @@ class FinCalc {
               else {
                 if (changeBalance(loginUsername, convertedSourceAmount, false)) {
                   changeBalance(username, convertedDestinationAmount, true);
-                  System.out.println("Transferred " + convertedSourceAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + sourcePreferredCurrency + "/" + convertedDestinationAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + destinationPreferredCurrency + " from your account to the account of " + username + ". Your new balance is " + accounts.get(getAccount(loginUsername)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + sourcePreferredCurrency + ". Its new balance is " + accounts.get(getAccount(username)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + destinationPreferredCurrency + ".");
+                  System.out.println("Transferred " + convertedSourceAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + sourcePreferredCurrency + "/" + convertedDestinationAmount.setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + destinationPreferredCurrency + " from your account to the account of " + username + ". Your new balance is " + accounts.get(getAccount(loginUsername)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + sourcePreferredCurrency + ". Their new balance is " + accounts.get(getAccount(username)).getBalance().setScale(2, BigDecimal.ROUND_HALF_EVEN) + " " + destinationPreferredCurrency + ".");
                 }
                 else {
                   System.out.println("Insufficient funds.");
@@ -485,7 +485,7 @@ class FinCalc {
     }
   }
 
-  // Deletes an account
+  // Deletes an account from the text file and ArrayList
   private boolean deleteAccount(String username) {
     try {
       if (getAccount(username) >= 0) {
@@ -533,8 +533,10 @@ class FinCalc {
         updateAccountBalance(username, newBalance);
         return true;
       }
+      else {
+        return false;
+      }
     }
-    return false;
   }
 
   // Updates the account balance of an existing account in the text file
