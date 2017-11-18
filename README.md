@@ -20,6 +20,10 @@ Would you like to save this currency conversion data in the database? (y/n): y
 Currency pair saved.
 >> adduser john12 pass123! jpy
 Account added successfully.
+>> adduser mary8 2trees eur
+Account added successfully.
+>> deluser mary8
+Account deleted successfully.
 >> add usd 100
 Added 100.00 USD to your account. Your new balance is 100.00 USD.
 >> sub jpy 100
