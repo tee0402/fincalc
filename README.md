@@ -7,7 +7,7 @@ Once the application has started, you will need to login. The credentials for th
 
 Usernames must start with a letter and cannot have special characters in them. Passwords have no restrictions. Both the username and password are case sensitive and have no requirement for length. For currencies, only three letter currency ISO Codes can be entered. For conversion rates and currency amounts, any special characters such as dollar signs are removed prior to processing. Commas are also removed, as they are assumed to be thousands separators and decimal points are assumed to be represented by a period, so any currencies using commas as decimals points or periods as thousands separators are not supported. Currencies using spaces as thousands separators are also not supported, as there is no way to distinguish between a thousands separator and a separator of arguments.
 
-## Example Runs
+## Example Run
 Here is what a typical use of the program could look like:
 ```
 Please enter your username: admin
