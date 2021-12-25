@@ -1,10 +1,10 @@
 import java.math.*;
 
 class Account {
-  private String username;
-  private String salt;
-  private String password;
-  private String preferredCurrency;
+  private final String username;
+  private final String salt;
+  private final String password;
+  private final String preferredCurrency;
   private BigDecimal balance;
 
   Account(String username, String salt, String password, String preferredCurrency, BigDecimal balance) {

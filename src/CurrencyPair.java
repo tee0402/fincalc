@@ -1,9 +1,9 @@
 import java.math.*;
 
 class CurrencyPair {
-  private String currency1;
-  private String currency2;
-  private BigDecimal conversionRate;
+  private final String currency1;
+  private final String currency2;
+  private final BigDecimal conversionRate;
 
   CurrencyPair(String currency1, String currency2, BigDecimal conversionRate) {
     this.currency1 = currency1;
@@ -11,11 +11,11 @@ class CurrencyPair {
     this.conversionRate = conversionRate;
   }
 
-  private String getCurrency1() {
+  String getCurrency1() {
     return currency1;
   }
 
-  private String getCurrency2() {
+  String getCurrency2() {
     return currency2;
   }
 
@@ -23,7 +23,7 @@ class CurrencyPair {
     return conversionRate;
   }
 
-  boolean equals(CurrencyPair currencyPair) {
-    return currencyPair.getCurrency1().equals(currency1) && currencyPair.getCurrency2().equals(currency2);
+  boolean equals(String currency1, String currency2) {
+    return this.currency1.equals(currency1) && this.currency2.equals(currency2);
   }
 }
