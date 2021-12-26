@@ -143,32 +143,46 @@ class FinCalc {
       if (currency1.equals(currency2)) {
         System.out.println("Currency 1 and currency 2 must be different.");
       } else {
-        boolean boolVerified = false;
+        boolean currency1Verified, currency2Verified;
+        try {
+          Currency.getInstance(currency1);
+          currency1Verified = true;
+        } catch (IllegalArgumentException e) {
+          System.out.println(currency1 + " is not a valid currency. Please refer to ISO 4217 for currency codes.");
+          currency1Verified = false;
+        }
+        try {
+          Currency.getInstance(currency2);
+          currency2Verified = true;
+        } catch (IllegalArgumentException e) {
+          System.out.println(currency2 + " is not a valid currency. Please refer to ISO 4217 for currency codes.");
+          currency2Verified = false;
+        }
+        if (currency1Verified && currency2Verified) {
+          System.out.println(currency1 + "/" + currency2 + "=" + conversionRate.toPlainString());
 
-        System.out.println(currency1 + "/" + currency2 + "=" + conversionRate.toPlainString());
-        System.out.print("Would you like to save this currency conversion data in the database? (y/n): ");
+          CurrencyPair currencyPair = currencyPairs.getCurrencyPairIgnoreOrder(currency1, currency2);
+          if (currencyPair != null) {
+            System.out.print("Currency pair " + currencyPair.getCurrency1() + "/" + currencyPair.getCurrency2() + "=" + currencyPair.getConversionRate().toPlainString() + " already exists. Overwrite? (y/n): ");
+          } else {
+            System.out.print("Would you like to save this currency conversion data in the database? (y/n): ");
+          }
 
-        while (!boolVerified) {
-          String command = scanner.nextLine();
-          switch (command) {
-            case "y":
-              boolVerified = true;
-              if (currencyPairs.contains(currency1, currency2)) {
-                System.out.println("Saving failed. Currency pair already exists.");
+          while (true) {
+            String command = scanner.nextLine();
+            if (command.equalsIgnoreCase("y")) {
+              if (currencyPairs.addOrUpdateCurrencyPairIgnoreOrder(currency1, currency2, conversionRate)) {
+                System.out.println("Currency pair saved.");
               } else {
-                if (currencyPairs.addCurrencyPair(currency1, currency2, conversionRate)) {
-                  System.out.println("Currency pair saved.");
-                } else {
-                  System.out.println("Saving failed.");
-                }
+                System.out.println("Saving failed.");
               }
               break;
-            case "n":
-              boolVerified = true;
+            } else if (command.equalsIgnoreCase("n")) {
               System.out.println("Saving canceled.");
               break;
-            default:
+            } else {
               System.out.print("Please enter 'y' for yes or 'n' for no: ");
+            }
           }
         }
       }

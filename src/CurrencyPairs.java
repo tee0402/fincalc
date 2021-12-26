@@ -29,7 +29,7 @@ class CurrencyPairs {
   }
 
   // Returns the currency pair with the specified currencies if found and null otherwise
-  private CurrencyPair getCurrencyPair(String currency1, String currency2) {
+  CurrencyPair getCurrencyPair(String currency1, String currency2) {
     for (CurrencyPair currencyPair : currencyPairs) {
       if (currencyPair.equals(currency1, currency2)) {
         return currencyPair;
@@ -38,19 +38,29 @@ class CurrencyPairs {
     return null;
   }
 
-  // Returns true if the currency pair with the specified currencies exists and false otherwise
-  boolean contains(String currency1, String currency2) {
-    return getCurrencyPair(currency1, currency2) != null;
+  // Returns the currency pair with the specified currencies regardless of order if found and null otherwise
+  CurrencyPair getCurrencyPairIgnoreOrder(String currency1, String currency2) {
+    for (CurrencyPair currencyPair : currencyPairs) {
+      if (currencyPair.equalsIgnoreOrder(currency1, currency2)) {
+        return currencyPair;
+      }
+    }
+    return null;
   }
 
-  // Adds a new currency pair to the text file and ArrayList
-  boolean addCurrencyPair(String currency1, String currency2, BigDecimal conversionRate) {
-    if (contains(currency1, currency2)) {
-      return false;
+  // Adds or updates a currency pair ignoring order
+  boolean addOrUpdateCurrencyPairIgnoreOrder(String currency1, String currency2, BigDecimal conversionRate) {
+    CurrencyPair currencyPair1 = getCurrencyPair(currency1, currency2);
+    CurrencyPair currencyPair2 = getCurrencyPair(currency2, currency1);
+    if (currencyPair1 != null) {
+      currencyPair1.setConversionRate(conversionRate);
     } else {
+      if (currencyPair2 != null) {
+        currencyPairs.remove(currencyPair2);
+      }
       currencyPairs.add(new CurrencyPair(currency1, currency2, conversionRate));
-      return updateCurrencyPairsFile();
     }
+    return updateCurrencyPairsFile();
   }
 
   // Updates text file containing currency pairs
