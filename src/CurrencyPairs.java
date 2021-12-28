@@ -29,7 +29,7 @@ class CurrencyPairs {
   }
 
   // Returns the currency pair with the specified currencies if found and null otherwise
-  CurrencyPair getCurrencyPair(String currency1, String currency2) {
+  private CurrencyPair getCurrencyPair(String currency1, String currency2) {
     for (CurrencyPair currencyPair : currencyPairs) {
       if (currencyPair.equals(currency1, currency2)) {
         return currencyPair;

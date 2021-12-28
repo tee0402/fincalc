@@ -6,6 +6,7 @@ class FinCalc {
   private final Accounts accounts;
   private final Scanner scanner;
   private String loginUsername;
+  private Scanner lineScanner;
 
   // Loads accounts and currency pairs
   FinCalc() {
@@ -16,7 +17,7 @@ class FinCalc {
 
   // Runs the command line application
   void run() {
-    authenticate();
+    loginUsername = authenticate();
     if (loginUsername.equals("admin")) {
       admin();
     } else {
@@ -27,14 +28,14 @@ class FinCalc {
   }
 
   // Login phase
-  private void authenticate() {
+  private String authenticate() {
     while (true) {
       System.out.print("Please enter your username: ");
-      loginUsername = scanner.nextLine();
+      String username = scanner.nextLine();
       System.out.print("Please enter your password: ");
-      String loginPassword = scanner.nextLine();
-      if (accounts.authenticate(loginUsername, loginPassword)) {
-        break;
+      String password = scanner.nextLine();
+      if (validateUsernameInput(username) && validatePasswordInput(password) && accounts.authenticate(username, password)) {
+        return username;
       } else {
         System.out.println("Incorrect username or password. Please try again.");
       }
@@ -49,21 +50,21 @@ class FinCalc {
     while (true) {
       System.out.print(">> ");
 
-      Scanner lineScanner = new Scanner(scanner.nextLine());
+      lineScanner = new Scanner(scanner.nextLine());
       String command = lineScanner.next();
 
       if (command.equalsIgnoreCase("MAINT")) {
-        maint(lineScanner);
+        maint();
       } else if (command.equalsIgnoreCase("ADDUSER")) {
-        addUser(lineScanner);
+        addUser();
       } else if (command.equalsIgnoreCase("DELUSER")) {
-        delUser(lineScanner);
+        delUser();
       } else if (command.equalsIgnoreCase("ADD")) {
-        changeBalance(lineScanner, true, true);
+        changeBalance(true, true);
       } else if (command.equalsIgnoreCase("SUB")) {
-        changeBalance(lineScanner, false, true);
+        changeBalance(false, true);
       } else if (command.equalsIgnoreCase("TRANSFER")) {
-        transfer(lineScanner, true);
+        transfer(true);
       } else if (command.equalsIgnoreCase("help")) {
         System.out.println("Use ISO Codes for currencies, e.g. USD, EUR, JPY");
         System.out.println("Conversion rate is the number of units of currency 2 that are equal to one unit of currency 1");
@@ -93,15 +94,15 @@ class FinCalc {
     while (true) {
       System.out.print(">> ");
 
-      Scanner lineScanner = new Scanner(scanner.nextLine());
+      lineScanner = new Scanner(scanner.nextLine());
       String command = lineScanner.next();
 
       if (command.equalsIgnoreCase("ADD")) {
-        changeBalance(lineScanner, true, false);
+        changeBalance(true, false);
       } else if (command.equalsIgnoreCase("SUB")) {
-        changeBalance(lineScanner, false, false);
+        changeBalance(false, false);
       } else if (command.equalsIgnoreCase("TRANSFER")) {
-        transfer(lineScanner, false);
+        transfer(false);
       } else if (command.equalsIgnoreCase("help")) {
         System.out.println("Use ISO Codes for currencies, e.g. USD, EUR, JPY");
         System.out.println();
@@ -119,71 +120,37 @@ class FinCalc {
     }
   }
 
-  private void maint(Scanner lineScanner) {
-    String currency1 = "";
-    String currency2 = "";
-    BigDecimal conversionRate = BigDecimal.ZERO;
+  private void maint() {
+    String currency1 = readStringToUpperCase();
+    String currency2 = readStringToUpperCase();
+    BigDecimal conversionRate = readBigDecimalStripTrailingZeros();
+    boolean currency1Validated = validateCurrencyInput(currency1);
+    boolean currency2Validated = validateCurrencyInput(currency2);
 
-    if (lineScanner.hasNext()) {
-      currency1 = lineScanner.next().toUpperCase();
-    }
-    if (lineScanner.hasNext()) {
-      currency2 = lineScanner.next().toUpperCase();
-    }
-    if (lineScanner.hasNextBigDecimal()) {
-      conversionRate = lineScanner.nextBigDecimal().stripTrailingZeros();
-    } else if (lineScanner.hasNext()) {
-      String conversionRateInput = lineScanner.next().replaceAll("[^0-9.]", "");
-      if (conversionRateInput.matches("^[0-9.]$")) {
-        conversionRate = new BigDecimal(conversionRateInput).stripTrailingZeros();
-      }
-    }
+    if (!currency1.equals(currency2) && currency1Validated && currency2Validated && isPositive(conversionRate)) {
+      System.out.println(currency1 + "/" + currency2 + "=" + conversionRate.toPlainString());
 
-    if (currency1.matches("^[A-Z]{3}$") && currency2.matches("^[A-Z]{3}$") && conversionRate.compareTo(BigDecimal.ZERO) > 0) {
-      if (currency1.equals(currency2)) {
-        System.out.println("Currency 1 and currency 2 must be different.");
+      CurrencyPair currencyPair = currencyPairs.getCurrencyPairIgnoreOrder(currency1, currency2);
+      if (currencyPair != null) {
+        System.out.print("Currency pair " + currencyPair.getCurrency1() + "/" + currencyPair.getCurrency2() + "=" + currencyPair.getConversionRate().toPlainString() + " already exists. Overwrite? (y/n): ");
       } else {
-        boolean currency1Verified, currency2Verified;
-        try {
-          Currency.getInstance(currency1);
-          currency1Verified = true;
-        } catch (IllegalArgumentException e) {
-          System.out.println(currency1 + " is not a valid currency. Please refer to ISO 4217 for currency codes.");
-          currency1Verified = false;
-        }
-        try {
-          Currency.getInstance(currency2);
-          currency2Verified = true;
-        } catch (IllegalArgumentException e) {
-          System.out.println(currency2 + " is not a valid currency. Please refer to ISO 4217 for currency codes.");
-          currency2Verified = false;
-        }
-        if (currency1Verified && currency2Verified) {
-          System.out.println(currency1 + "/" + currency2 + "=" + conversionRate.toPlainString());
+        System.out.print("Would you like to save this currency conversion data in the database? (y/n): ");
+      }
 
-          CurrencyPair currencyPair = currencyPairs.getCurrencyPairIgnoreOrder(currency1, currency2);
-          if (currencyPair != null) {
-            System.out.print("Currency pair " + currencyPair.getCurrency1() + "/" + currencyPair.getCurrency2() + "=" + currencyPair.getConversionRate().toPlainString() + " already exists. Overwrite? (y/n): ");
+      while (true) {
+        String command = scanner.nextLine();
+        if (command.equalsIgnoreCase("y")) {
+          if (currencyPairs.addOrUpdateCurrencyPairIgnoreOrder(currency1, currency2, conversionRate)) {
+            System.out.println("Currency pair saved.");
           } else {
-            System.out.print("Would you like to save this currency conversion data in the database? (y/n): ");
+            System.out.println("Saving failed.");
           }
-
-          while (true) {
-            String command = scanner.nextLine();
-            if (command.equalsIgnoreCase("y")) {
-              if (currencyPairs.addOrUpdateCurrencyPairIgnoreOrder(currency1, currency2, conversionRate)) {
-                System.out.println("Currency pair saved.");
-              } else {
-                System.out.println("Saving failed.");
-              }
-              break;
-            } else if (command.equalsIgnoreCase("n")) {
-              System.out.println("Saving canceled.");
-              break;
-            } else {
-              System.out.print("Please enter 'y' for yes or 'n' for no: ");
-            }
-          }
+          break;
+        } else if (command.equalsIgnoreCase("n")) {
+          System.out.println("Saving canceled.");
+          break;
+        } else {
+          System.out.print("Please enter 'y' for yes or 'n' for no: ");
         }
       }
     } else {
@@ -192,22 +159,12 @@ class FinCalc {
     }
   }
 
-  private void addUser(Scanner lineScanner) {
-    String username = "";
-    String password = "";
-    String preferredCurrency = "";
+  private void addUser() {
+    String username = readString();
+    String password = readString();
+    String preferredCurrency = readStringToUpperCase();
 
-    if (lineScanner.hasNext()) {
-      username = lineScanner.next();
-    }
-    if (lineScanner.hasNext()) {
-      password = lineScanner.next();
-    }
-    if (lineScanner.hasNext()) {
-      preferredCurrency = lineScanner.next().toUpperCase();
-    }
-
-    if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && password.matches("^\\S+$") && preferredCurrency.matches("^[A-Z]{3}$")) {
+    if (validateUsernameInput(username) && validatePasswordInput(password) && validateCurrencyInput(preferredCurrency)) {
       if (accounts.addAccount(username, password, preferredCurrency)) {
         System.out.println("Account added successfully.");
       } else {
@@ -219,14 +176,10 @@ class FinCalc {
     }
   }
 
-  private void delUser(Scanner lineScanner) {
-    String username = "";
+  private void delUser() {
+    String username = readString();
 
-    if (lineScanner.hasNext()) {
-      username = lineScanner.next();
-    }
-
-    if (username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$")) {
+    if (validateUsernameInput(username)) {
       if (accounts.deleteAccount(username)) {
         System.out.println("Account deleted successfully.");
       } else {
@@ -238,32 +191,17 @@ class FinCalc {
     }
   }
 
-  private void changeBalance(Scanner lineScanner, boolean add, boolean admin) {
-    String username = admin ? "" : loginUsername;
-    String currency = "";
-    BigDecimal amount = BigDecimal.ZERO;
+  private void changeBalance(boolean add, boolean admin) {
+    String username = admin ? readString() : loginUsername;
+    String currency = readStringToUpperCase();
+    BigDecimal amount = readBigDecimal();
 
-    if (admin && lineScanner.hasNext()) {
-      username = lineScanner.next();
-    }
-    if (lineScanner.hasNext()) {
-      currency = lineScanner.next().toUpperCase();
-    }
-    if (lineScanner.hasNextBigDecimal()) {
-      amount = lineScanner.nextBigDecimal();
-    } else if (lineScanner.hasNext()) {
-      String amountInput = lineScanner.next().replaceAll("[^0-9.]", "");
-      if (amountInput.matches("^[0-9.]$")) {
-        amount = new BigDecimal(amountInput);
-      }
-    }
-
-    if ((!admin || username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$")) && currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
+    if ((!admin || validateUsernameInput(username)) && validateCurrencyInput(currency) && isPositive(amount)) {
       if (!admin || accounts.contains(username)) {
         String preferredCurrency = accounts.getAccount(username).getPreferredCurrency();
         BigDecimal convertedAmount = currencyPairs.convert(currency, preferredCurrency, amount);
         if (convertedAmount == null) {
-          System.out.println("No conversion data to " + preferredCurrency + ". Please enter conversion data first.");
+          System.out.println("No conversion data from " + currency + " to " + preferredCurrency + ". Please enter conversion data first.");
         } else {
           BigDecimal newBalance = accounts.changeBalance(username, convertedAmount, add);
           if (add || newBalance != null) {
@@ -281,41 +219,25 @@ class FinCalc {
     }
   }
 
-  private void transfer(Scanner lineScanner, boolean admin) {
-    String sourceUsername = admin ? "" : loginUsername;
-    String destinationUsername = "";
-    String currency = "";
-    BigDecimal amount = BigDecimal.ZERO;
+  private void transfer(boolean admin) {
+    String sourceUsername = admin ? readString() : loginUsername;
+    String destinationUsername = readString();
+    String currency = readStringToUpperCase();
+    BigDecimal amount = readBigDecimal();
 
-    if (admin && lineScanner.hasNext()) {
-      sourceUsername = lineScanner.next();
-    }
-    if (lineScanner.hasNext()) {
-      destinationUsername = lineScanner.next();
-    }
-    if (lineScanner.hasNext()) {
-      currency = lineScanner.next().toUpperCase();
-    }
-    if (lineScanner.hasNextBigDecimal()) {
-      amount = lineScanner.nextBigDecimal();
-    } else if (lineScanner.hasNext()) {
-      String amountInput = lineScanner.next().replaceAll("[^0-9.]", "");
-      if (amountInput.matches("^[0-9.]$")) {
-        amount = new BigDecimal(amountInput);
-      }
-    }
-
-    if ((!admin || sourceUsername.matches("^[a-zA-Z]+[a-zA-Z0-9]*$")) && destinationUsername.matches("^[a-zA-Z]+[a-zA-Z0-9]*$") && currency.matches("^[A-Z]{3}$") && amount.compareTo(BigDecimal.ZERO) > 0) {
+    if ((!admin || validateUsernameInput(sourceUsername)) && validateUsernameInput(destinationUsername) && validateCurrencyInput(currency) && isPositive(amount)) {
       if ((!admin || accounts.contains(sourceUsername)) && accounts.contains(destinationUsername)) {
         String sourcePreferredCurrency = accounts.getAccount(sourceUsername).getPreferredCurrency();
         String destinationPreferredCurrency = accounts.getAccount(destinationUsername).getPreferredCurrency();
         BigDecimal convertedSourceAmount = currencyPairs.convert(currency, sourcePreferredCurrency, amount);
         BigDecimal convertedDestinationAmount = currencyPairs.convert(currency, destinationPreferredCurrency, amount);
         if (convertedSourceAmount == null) {
-          System.out.println("No conversion data to " + sourcePreferredCurrency + ". Please enter conversion data first.");
-        } else if (convertedDestinationAmount == null) {
-          System.out.println("No conversion data to " + destinationPreferredCurrency + ". Please enter conversion data first.");
-        } else {
+          System.out.println("No conversion data from " + currency + " to " + sourcePreferredCurrency + ". Please enter conversion data first.");
+        }
+        if (convertedDestinationAmount == null) {
+          System.out.println("No conversion data from " + currency + " to " + destinationPreferredCurrency + ". Please enter conversion data first.");
+        }
+        if (convertedSourceAmount != null && convertedDestinationAmount != null) {
           BigDecimal newSourceBalance = accounts.changeBalance(sourceUsername, convertedSourceAmount, false);
           if (newSourceBalance != null) {
             BigDecimal newDestinationBalance = accounts.changeBalance(destinationUsername, convertedDestinationAmount, true);
@@ -331,6 +253,62 @@ class FinCalc {
       System.out.println("Please enter valid arguments for TRANSFER:");
       System.out.println(admin ? "TRANSFER [username 1] [username 2] [currency] [amount]" : "TRANSFER [username] [currency] [amount]");
     }
+  }
+
+  private String readString() {
+    return lineScanner.hasNext() ? lineScanner.next() : "";
+  }
+
+  private String readStringToUpperCase() {
+    return lineScanner.hasNext() ? lineScanner.next().toUpperCase() : "";
+  }
+
+  private BigDecimal readBigDecimal() {
+    if (lineScanner.hasNextBigDecimal()) {
+      return lineScanner.nextBigDecimal();
+    } else if (lineScanner.hasNext()) {
+      String bigDecimalInput = lineScanner.next().replaceAll("[^0-9.]", "");
+      return bigDecimalInput.matches("^[0-9.]$") ? new BigDecimal(bigDecimalInput) : BigDecimal.ZERO;
+    } else {
+      return BigDecimal.ZERO;
+    }
+  }
+
+  private BigDecimal readBigDecimalStripTrailingZeros() {
+    if (lineScanner.hasNextBigDecimal()) {
+      return lineScanner.nextBigDecimal().stripTrailingZeros();
+    } else if (lineScanner.hasNext()) {
+      String bigDecimalInput = lineScanner.next().replaceAll("[^0-9.]", "");
+      return bigDecimalInput.matches("^[0-9.]$") ? new BigDecimal(bigDecimalInput).stripTrailingZeros() : BigDecimal.ZERO;
+    } else {
+      return BigDecimal.ZERO;
+    }
+  }
+
+  private boolean validateUsernameInput(String username) {
+    return username.matches("^[a-zA-Z]+[a-zA-Z0-9]*$");
+  }
+
+  private boolean validatePasswordInput(String password) {
+    return password.matches("^\\S+$");
+  }
+
+  private boolean validateCurrencyInput(String currency) {
+    if (currency.matches("^[A-Z]{3}$")) {
+      try {
+        Currency.getInstance(currency);
+        return true;
+      } catch (IllegalArgumentException e) {
+        System.out.println(currency + " is not a valid currency. Please refer to ISO 4217 for currency codes.");
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  private boolean isPositive(BigDecimal bigDecimal) {
+    return bigDecimal.compareTo(BigDecimal.ZERO) > 0;
   }
 
   // Round amount to two decimal places
