@@ -3,15 +3,10 @@ import java.math.*;
 import java.util.*;
 
 class CurrencyPairs {
-  private final ArrayList<CurrencyPair> currencyPairs;
+  private final ArrayList<CurrencyPair> currencyPairs = new ArrayList<>();
 
   CurrencyPairs() {
-    currencyPairs = new ArrayList<>();
-    loadCurrencyData();
-  }
-
-  // Loads currency pairs into ArrayList
-  private void loadCurrencyData() {
+    // Load currency pairs into ArrayList
     try {
       File file = new File("currencypairs.txt");
       if (file.exists() || file.createNewFile()) {

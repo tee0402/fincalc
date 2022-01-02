@@ -2,21 +2,13 @@ import java.math.*;
 import java.util.*;
 
 class FinCalc {
-  private final CurrencyPairs currencyPairs;
-  private final Accounts accounts;
-  private final Scanner scanner;
-  private String loginUsername;
+  private final Accounts accounts = new Accounts();
+  private final CurrencyPairs currencyPairs = new CurrencyPairs();
+  private final Scanner scanner = new Scanner(System.in);
+  private final String loginUsername;
   private Scanner lineScanner;
 
-  // Loads accounts and currency pairs
   FinCalc() {
-    accounts = new Accounts();
-    currencyPairs = new CurrencyPairs();
-    scanner = new Scanner(System.in);
-  }
-
-  // Runs the command line application
-  void run() {
     loginUsername = authenticate();
     if (loginUsername.equals("admin")) {
       admin();

@@ -5,15 +5,10 @@ import java.security.*;
 import java.util.*;
 
 class Accounts {
-  private final ArrayList<Account> accounts;
+  private final ArrayList<Account> accounts = new ArrayList<>();
 
   Accounts() {
-    accounts = new ArrayList<>();
-    loadAccountData();
-  }
-
-  // Loads account information into ArrayList
-  private void loadAccountData() {
+    // Load account information into ArrayList
     try {
       File file = new File("accounts.txt");
       if (file.exists()) {
