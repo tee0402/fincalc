@@ -63,7 +63,7 @@ class CurrencyPairs {
     try {
       FileWriter fileWriter = new FileWriter("currencypairs.txt");
       for (CurrencyPair currencyPair : currencyPairs) {
-        fileWriter.write(currencyPair.getCurrency1() + " " + currencyPair.getCurrency2() + " " + currencyPair.getConversionRate().toPlainString() + "\n");
+        fileWriter.write(currencyPair.getCurrency1() + " " + currencyPair.getCurrency2() + " " + currencyPair.getConversionRateString() + "\n");
       }
       fileWriter.close();
       return true;

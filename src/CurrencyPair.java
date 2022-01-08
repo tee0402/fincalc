@@ -22,6 +22,9 @@ class CurrencyPair {
   BigDecimal getConversionRate() {
     return conversionRate;
   }
+  String getConversionRateString() {
+    return conversionRate.toPlainString();
+  }
 
   void setConversionRate(BigDecimal conversionRate) {
     this.conversionRate = conversionRate;

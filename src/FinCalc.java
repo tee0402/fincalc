@@ -124,7 +124,7 @@ class FinCalc {
 
       CurrencyPair currencyPair = currencyPairs.getCurrencyPairIgnoreOrder(currency1, currency2);
       if (currencyPair != null) {
-        System.out.print("Currency pair " + currencyPair.getCurrency1() + "/" + currencyPair.getCurrency2() + "=" + currencyPair.getConversionRate().toPlainString() + " already exists. Overwrite? (y/n): ");
+        System.out.print("Currency pair " + currencyPair.getCurrency1() + "/" + currencyPair.getCurrency2() + "=" + currencyPair.getConversionRateString() + " already exists. Overwrite? (y/n): ");
       } else {
         System.out.print("Would you like to save this currency conversion data in the database? (y/n): ");
       }
