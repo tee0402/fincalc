@@ -1,8 +1,13 @@
-import java.io.*;
-import java.math.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
-import java.util.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 class Accounts {
   private final ArrayList<Account> accounts = new ArrayList<>();

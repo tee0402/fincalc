@@ -1,5 +1,7 @@
-import java.math.*;
-import java.util.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Currency;
+import java.util.Scanner;
 
 class FinCalc {
   private final Accounts accounts = new Accounts();

@@ -1,4 +1,4 @@
-import java.math.*;
+import java.math.BigDecimal;
 
 class Account {
   private final String username;

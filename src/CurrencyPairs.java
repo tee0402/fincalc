@@ -1,6 +1,11 @@
-import java.io.*;
-import java.math.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 class CurrencyPairs {
   private final ArrayList<CurrencyPair> currencyPairs = new ArrayList<>();

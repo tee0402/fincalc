@@ -1,4 +1,4 @@
-import java.math.*;
+import java.math.BigDecimal;
 
 class CurrencyPair {
   private final String currency1;
