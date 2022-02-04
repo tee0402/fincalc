@@ -6,9 +6,9 @@ class CurrencyPairs {
   private final ArrayList<CurrencyPair> currencyPairs = new ArrayList<>();
 
   CurrencyPairs() {
-    // Load currency pairs into ArrayList
     try {
       File file = new File("currencypairs.txt");
+      // Load currency pair information
       if (file.exists() || file.createNewFile()) {
         Scanner scanner = new Scanner(file);
         while (scanner.hasNextLine()) {

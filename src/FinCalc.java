@@ -65,8 +65,8 @@ class FinCalc {
         System.out.println("MAINT [currency 1] [currency 2] [conversion rate] - Enter currency conversion data");
         System.out.println("ADDUSER [username] [password] [preferred currency] - Add a new account with <username> and <password> and set the preferred currency");
         System.out.println("DELUSER [username] - Delete account with <username>");
-        System.out.println("ADD [username] [currency] [amount] - Add <amount> in <currency> to account with <username>");
-        System.out.println("SUB [username] [currency] [amount] - Remove <amount> in <currency> from account with <username>");
+        System.out.println("ADD [username] [currency] [amount] - Deposit <amount> in <currency> into account with <username>");
+        System.out.println("SUB [username] [currency] [amount] - Withdraw <amount> in <currency> from account with <username>");
         System.out.println("TRANSFER [username 1] [username 2] [currency] [amount] - Transfer <amount> in <currency> from account with <username 1> to account with <username 2>");
         System.out.println("quit - Exit the program");
       } else if (command.equalsIgnoreCase("quit")) {
@@ -99,8 +99,8 @@ class FinCalc {
         System.out.println("Use ISO Codes for currencies, e.g. USD, EUR, JPY");
         System.out.println();
         System.out.println("LIST OF COMMANDS:");
-        System.out.println("ADD [currency] [amount] - Add <amount> in <currency> to your account");
-        System.out.println("SUB [currency] [amount] - Remove <amount> in <currency> from your account");
+        System.out.println("ADD [currency] [amount] - Deposit <amount> in <currency> into your account");
+        System.out.println("SUB [currency] [amount] - Withdraw <amount> in <currency> from your account");
         System.out.println("TRANSFER [username] [currency] [amount] - Transfer <amount> in <currency> from your account to account with <username>");
         System.out.println("quit - Exit the program");
       } else if (command.equalsIgnoreCase("quit")) {
@@ -183,7 +183,7 @@ class FinCalc {
     }
   }
 
-  private void changeBalance(boolean add, boolean admin) {
+  private void changeBalance(boolean deposit, boolean admin) {
     String username = admin ? readString() : loginUsername;
     String currency = readStringToUpperCase();
     BigDecimal amount = readBigDecimal();
@@ -195,9 +195,9 @@ class FinCalc {
         if (convertedAmount == null) {
           System.out.println("No conversion data from " + currency + " to " + preferredCurrency + ". Please enter conversion data first.");
         } else {
-          BigDecimal newBalance = accounts.changeBalance(username, convertedAmount, add);
-          if (add || newBalance != null) {
-            System.out.println((add ? "Added " : "Removed ") + convertedAmount + " " + preferredCurrency + (admin ? (add ? " to the account of " : " from the account of ") + username + ". Its new balance is " : (add ? " to your account. Your new balance is " : " from your account. Your new balance is ")) + newBalance + " " + preferredCurrency + ".");
+          BigDecimal newBalance = accounts.changeBalance(username, convertedAmount, deposit);
+          if (newBalance != null) {
+            System.out.println((deposit ? "Deposited " : "Withdrew ") + convertedAmount + " " + preferredCurrency + (admin ? (deposit ? " into the account of " : " from the account of ") + username + ". Its new balance is " : (deposit ? " into your account. Your new balance is " : " from your account. Your new balance is ")) + newBalance + " " + preferredCurrency + ".");
           } else {
             System.out.println("Insufficient funds.");
           }
@@ -206,8 +206,8 @@ class FinCalc {
         System.out.println("Account does not exist.");
       }
     } else {
-      System.out.println(add ? "Please enter valid arguments for ADD:" : "Please enter valid arguments for SUB:");
-      System.out.println(add ? (admin ? "ADD [username] [currency] [amount]" : "ADD [currency] [amount]") : (admin ? "SUB [username] [currency] [amount]" : "SUB [currency] [amount]"));
+      System.out.println(deposit ? "Please enter valid arguments for ADD:" : "Please enter valid arguments for SUB:");
+      System.out.println(deposit ? (admin ? "ADD [username] [currency] [amount]" : "ADD [currency] [amount]") : (admin ? "SUB [username] [currency] [amount]" : "SUB [currency] [amount]"));
     }
   }
 

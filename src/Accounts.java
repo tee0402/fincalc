@@ -8,14 +8,13 @@ class Accounts {
   private final ArrayList<Account> accounts = new ArrayList<>();
 
   Accounts() {
-    // Load account information into ArrayList
     try {
       File file = new File("accounts.txt");
+      // Load account information, create admin account if first run
       if (file.exists()) {
         Scanner scanner = new Scanner(file);
         while (scanner.hasNextLine()) {
-          String line = scanner.nextLine();
-          Scanner lineScanner = new Scanner(line);
+          Scanner lineScanner = new Scanner(scanner.nextLine());
           accounts.add(new Account(lineScanner.next(), lineScanner.next(), lineScanner.next(), lineScanner.next(), new BigDecimal(lineScanner.next())));
         }
         scanner.close();
@@ -30,7 +29,7 @@ class Accounts {
   // Converts a byte array to a hexadecimal string
   private String bytesToHex(byte[] bytes) {
     StringBuilder builder = new StringBuilder();
-    for(byte b : bytes) {
+    for (byte b : bytes) {
       builder.append(String.format("%02x", b));
     }
     return builder.toString();
