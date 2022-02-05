@@ -70,6 +70,14 @@ class Accounts {
     return null;
   }
 
+  BigDecimal getBalance(String username) {
+    Account account = getAccount(username);
+    if (account != null) {
+      return account.getBalance();
+    }
+    return null;
+  }
+
   String getPreferredCurrency(String username) {
     Account account = getAccount(username);
     if (account != null) {
@@ -109,6 +117,12 @@ class Accounts {
       return write();
     }
     return false;
+  }
+
+  void printUsernames() {
+    for (Account account : accounts) {
+      System.out.println(account.getUsername());
+    }
   }
 
   // Changes the balance of the account with the specified username, returns the new balance or null if the change failed

@@ -53,6 +53,10 @@ class FinCalc {
         addUser();
       } else if (command.equalsIgnoreCase("DELUSER")) {
         delUser();
+      } else if (command.equalsIgnoreCase("USERS")) {
+        users();
+      } else if (command.equalsIgnoreCase("BAL")) {
+        bal(true);
       } else if (command.equalsIgnoreCase("ADD")) {
         changeBalance(true, true);
       } else if (command.equalsIgnoreCase("SUB")) {
@@ -67,6 +71,8 @@ class FinCalc {
         System.out.println("MAINT [currency 1] [currency 2] [conversion rate] - Enter currency conversion data");
         System.out.println("ADDUSER [username] [password] [preferred currency] - Add a new account with <username> and <password> and set the preferred currency");
         System.out.println("DELUSER [username] - Delete account with <username>");
+        System.out.println("USERS - Show list of account usernames");
+        System.out.println("BAL [username] - Show balance in the preferred currency of account wth <username>");
         System.out.println("ADD [username] [currency] [amount] - Deposit <amount> in <currency> into account with <username>");
         System.out.println("SUB [username] [currency] [amount] - Withdraw <amount> in <currency> from account with <username>");
         System.out.println("TRANSFER [username 1] [username 2] [currency] [amount] - Transfer <amount> in <currency> from account with <username 1> to account with <username 2>");
@@ -91,7 +97,9 @@ class FinCalc {
       lineScanner = new Scanner(scanner.nextLine());
       String command = lineScanner.next();
 
-      if (command.equalsIgnoreCase("ADD")) {
+      if (command.equalsIgnoreCase("BAL")) {
+        bal(false);
+      } else if (command.equalsIgnoreCase("ADD")) {
         changeBalance(true, false);
       } else if (command.equalsIgnoreCase("SUB")) {
         changeBalance(false, false);
@@ -101,6 +109,7 @@ class FinCalc {
         System.out.println("Use ISO Codes for currencies, e.g. USD, EUR, JPY");
         System.out.println();
         System.out.println("LIST OF COMMANDS:");
+        System.out.println("BAL - Show your balance in your preferred currency");
         System.out.println("ADD [currency] [amount] - Deposit <amount> in <currency> into your account");
         System.out.println("SUB [currency] [amount] - Withdraw <amount> in <currency> from your account");
         System.out.println("TRANSFER [username] [currency] [amount] - Transfer <amount> in <currency> from your account to account with <username>");
@@ -182,6 +191,25 @@ class FinCalc {
     } else {
       System.out.println("Please enter valid arguments for DELUSER:");
       System.out.println("DELUSER [username]");
+    }
+  }
+
+  private void users() {
+    accounts.printUsernames();
+  }
+
+  private void bal(boolean admin) {
+    String username = admin ? readString() : loginUsername;
+
+    if (!admin || validateUsernameInput(username)) {
+      if (!admin || accounts.contains(username)) {
+        System.out.println(accounts.getBalance(username) + " " + accounts.getPreferredCurrency(username));
+      } else {
+        System.out.println("Account does not exist.");
+      }
+    } else {
+      System.out.println("Please enter valid arguments for BAL:");
+      System.out.println("BAL [username]");
     }
   }
 
