@@ -61,11 +61,19 @@ class Accounts {
   }
 
   // Returns the account with the specified username if found and null otherwise
-  Account getAccount(String username) {
+  private Account getAccount(String username) {
     for (Account account : accounts) {
       if (account.getUsername().equals(username)) {
         return account;
       }
+    }
+    return null;
+  }
+
+  String getPreferredCurrency(String username) {
+    Account account = getAccount(username);
+    if (account != null) {
+      return account.getPreferredCurrency();
     }
     return null;
   }
@@ -106,21 +114,24 @@ class Accounts {
   // Changes the balance of the account with the specified username, returns the new balance or null if the change failed
   BigDecimal changeBalance(String username, BigDecimal amount, boolean deposit) {
     Account account = getAccount(username);
-    if (deposit) {
-      BigDecimal newBalance = FinCalc.round(account.getBalance().add(amount));
-      account.setBalance(newBalance);
-      write();
-      return newBalance;
-    } else {
-      BigDecimal newBalance = FinCalc.round(account.getBalance().subtract(amount));
-      if (newBalance.compareTo(BigDecimal.ZERO) >= 0) {
+    if (account != null) {
+      if (deposit) {
+        BigDecimal newBalance = FinCalc.round(account.getBalance().add(amount));
         account.setBalance(newBalance);
         write();
         return newBalance;
       } else {
-        return null;
+        BigDecimal newBalance = FinCalc.round(account.getBalance().subtract(amount));
+        if (newBalance.compareTo(BigDecimal.ZERO) >= 0) {
+          account.setBalance(newBalance);
+          write();
+          return newBalance;
+        } else {
+          return null;
+        }
       }
     }
+    return null;
   }
 
   // Updates text file containing accounts
@@ -135,6 +146,45 @@ class Accounts {
     } catch (IOException e) {
       System.out.println(e.getMessage());
       return false;
+    }
+  }
+
+  private static class Account {
+    private final String username;
+    private final String salt;
+    private final String password;
+    private final String preferredCurrency;
+    private BigDecimal balance;
+
+    private Account(String username, String salt, String password, String preferredCurrency, BigDecimal balance) {
+      this.username = username;
+      this.salt = salt;
+      this.password = password;
+      this.preferredCurrency = preferredCurrency;
+      this.balance = balance;
+    }
+
+    private String getUsername() {
+      return username;
+    }
+
+    private String getSalt() {
+      return salt;
+    }
+
+    private String getPassword(){
+      return password;
+    }
+
+    private String getPreferredCurrency() {
+      return preferredCurrency;
+    }
+
+    private BigDecimal getBalance() {
+      return balance;
+    }
+    private void setBalance(BigDecimal balance) {
+      this.balance = balance;
     }
   }
 }

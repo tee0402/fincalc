@@ -192,7 +192,7 @@ class FinCalc {
 
     if ((!admin || validateUsernameInput(username)) && validateCurrencyInput(currency) && isPositive(amount)) {
       if (!admin || accounts.contains(username)) {
-        String preferredCurrency = accounts.getAccount(username).getPreferredCurrency();
+        String preferredCurrency = accounts.getPreferredCurrency(username);
         BigDecimal convertedAmount = currencyPairs.convert(currency, preferredCurrency, amount);
         if (convertedAmount == null) {
           System.out.println("No conversion data from " + currency + " to " + preferredCurrency + ". Please enter conversion data first.");
@@ -221,8 +221,8 @@ class FinCalc {
 
     if ((!admin || validateUsernameInput(sourceUsername)) && validateUsernameInput(destinationUsername) && validateCurrencyInput(currency) && isPositive(amount)) {
       if ((!admin || accounts.contains(sourceUsername)) && accounts.contains(destinationUsername)) {
-        String sourcePreferredCurrency = accounts.getAccount(sourceUsername).getPreferredCurrency();
-        String destinationPreferredCurrency = accounts.getAccount(destinationUsername).getPreferredCurrency();
+        String sourcePreferredCurrency = accounts.getPreferredCurrency(sourceUsername);
+        String destinationPreferredCurrency = accounts.getPreferredCurrency(destinationUsername);
         BigDecimal convertedSourceAmount = currencyPairs.convert(currency, sourcePreferredCurrency, amount);
         BigDecimal convertedDestinationAmount = currencyPairs.convert(currency, destinationPreferredCurrency, amount);
         if (convertedSourceAmount == null) {
