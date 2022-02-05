@@ -60,11 +60,11 @@ class CurrencyPairs {
       }
       currencyPairs.add(new CurrencyPair(currency1, currency2, conversionRate));
     }
-    return updateCurrencyPairsFile();
+    return write();
   }
 
   // Updates text file containing currency pairs
-  private boolean updateCurrencyPairsFile() {
+  private boolean write() {
     try {
       FileWriter fileWriter = new FileWriter("currencypairs.txt");
       for (CurrencyPair currencyPair : currencyPairs) {

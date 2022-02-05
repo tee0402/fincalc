@@ -89,7 +89,7 @@ class Accounts {
     } else {
       String salt = salt();
       accounts.add(new Account(username, salt, hash(salt + password), preferredCurrency, BigDecimal.ZERO));
-      return updateAccountsFile();
+      return write();
     }
   }
 
@@ -98,7 +98,7 @@ class Accounts {
     Account account = getAccount(username);
     if (account != null) {
       accounts.remove(account);
-      return updateAccountsFile();
+      return write();
     }
     return false;
   }
@@ -109,13 +109,13 @@ class Accounts {
     if (deposit) {
       BigDecimal newBalance = FinCalc.round(account.getBalance().add(amount));
       account.setBalance(newBalance);
-      updateAccountsFile();
+      write();
       return newBalance;
     } else {
       BigDecimal newBalance = FinCalc.round(account.getBalance().subtract(amount));
       if (newBalance.compareTo(BigDecimal.ZERO) >= 0) {
         account.setBalance(newBalance);
-        updateAccountsFile();
+        write();
         return newBalance;
       } else {
         return null;
@@ -124,7 +124,7 @@ class Accounts {
   }
 
   // Updates text file containing accounts
-  private boolean updateAccountsFile() {
+  private boolean write() {
     try {
       FileWriter fileWriter = new FileWriter("accounts.txt");
       for (Account account : accounts) {
