@@ -92,4 +92,42 @@ class CurrencyPairs {
       return null;
     }
   }
+
+  static class CurrencyPair {
+    private final String currency1;
+    private final String currency2;
+    private BigDecimal conversionRate;
+
+    private CurrencyPair(String currency1, String currency2, BigDecimal conversionRate) {
+      this.currency1 = currency1;
+      this.currency2 = currency2;
+      this.conversionRate = conversionRate;
+    }
+
+    String getCurrency1() {
+      return currency1;
+    }
+
+    String getCurrency2() {
+      return currency2;
+    }
+
+    private BigDecimal getConversionRate() {
+      return conversionRate;
+    }
+    String getConversionRateString() {
+      return conversionRate.toPlainString();
+    }
+    private void setConversionRate(BigDecimal conversionRate) {
+      this.conversionRate = conversionRate;
+    }
+
+    private boolean equals(String currency1, String currency2) {
+      return this.currency1.equals(currency1) && this.currency2.equals(currency2);
+    }
+
+    private boolean equalsIgnoreOrder(String currency1, String currency2) {
+      return (this.currency1.equals(currency1) && this.currency2.equals(currency2)) || (this.currency2.equals(currency1) && this.currency1.equals(currency2));
+    }
+  }
 }

@@ -133,7 +133,7 @@ class FinCalc {
     if (!currency1.equals(currency2) && currency1Validated && currency2Validated && isPositive(conversionRate)) {
       System.out.println(currency1 + "/" + currency2 + "=" + conversionRate.toPlainString());
 
-      CurrencyPair currencyPair = currencyPairs.getCurrencyPairIgnoreOrder(currency1, currency2);
+      CurrencyPairs.CurrencyPair currencyPair = currencyPairs.getCurrencyPairIgnoreOrder(currency1, currency2);
       if (currencyPair != null) {
         System.out.print("Currency pair " + currencyPair.getCurrency1() + "/" + currencyPair.getCurrency2() + "=" + currencyPair.getConversionRateString() + " already exists. Overwrite? (y/n): ");
       } else {
@@ -249,23 +249,27 @@ class FinCalc {
 
     if ((!admin || validateUsernameInput(sourceUsername)) && validateUsernameInput(destinationUsername) && validateCurrencyInput(currency) && isPositive(amount)) {
       if ((!admin || accounts.contains(sourceUsername)) && accounts.contains(destinationUsername)) {
-        String sourcePreferredCurrency = accounts.getPreferredCurrency(sourceUsername);
-        String destinationPreferredCurrency = accounts.getPreferredCurrency(destinationUsername);
-        BigDecimal convertedSourceAmount = currencyPairs.convert(currency, sourcePreferredCurrency, amount);
-        BigDecimal convertedDestinationAmount = currencyPairs.convert(currency, destinationPreferredCurrency, amount);
-        if (convertedSourceAmount == null) {
-          System.out.println("No conversion data from " + currency + " to " + sourcePreferredCurrency + ". Please enter conversion data first.");
-        }
-        if (convertedDestinationAmount == null) {
-          System.out.println("No conversion data from " + currency + " to " + destinationPreferredCurrency + ". Please enter conversion data first.");
-        }
-        if (convertedSourceAmount != null && convertedDestinationAmount != null) {
-          BigDecimal newSourceBalance = accounts.changeBalance(sourceUsername, convertedSourceAmount, false);
-          if (newSourceBalance != null) {
-            BigDecimal newDestinationBalance = accounts.changeBalance(destinationUsername, convertedDestinationAmount, true);
-            System.out.println("Transferred " + convertedSourceAmount + " " + sourcePreferredCurrency + "/" + convertedDestinationAmount + " " + destinationPreferredCurrency + (admin ? " from the account of " + sourceUsername + " to the account of " : " from your account to the account of ") + destinationUsername + (admin ? ". Their new balances are " : ". Your new balance is ") + newSourceBalance + " " + sourcePreferredCurrency + (admin ? " and " : ". Its new balance is ") + newDestinationBalance + " " + destinationPreferredCurrency + (admin ? " respectively." : "."));
-          } else {
-            System.out.println("Insufficient funds.");
+        if (sourceUsername.equals(destinationUsername)) {
+          System.out.println("The source and destination accounts cannot be the same.");
+        } else {
+          String sourcePreferredCurrency = accounts.getPreferredCurrency(sourceUsername);
+          String destinationPreferredCurrency = accounts.getPreferredCurrency(destinationUsername);
+          BigDecimal convertedSourceAmount = currencyPairs.convert(currency, sourcePreferredCurrency, amount);
+          BigDecimal convertedDestinationAmount = currencyPairs.convert(currency, destinationPreferredCurrency, amount);
+          if (convertedSourceAmount == null) {
+            System.out.println("No conversion data from " + currency + " to " + sourcePreferredCurrency + ". Please enter conversion data first.");
+          }
+          if (convertedDestinationAmount == null) {
+            System.out.println("No conversion data from " + currency + " to " + destinationPreferredCurrency + ". Please enter conversion data first.");
+          }
+          if (convertedSourceAmount != null && convertedDestinationAmount != null) {
+            BigDecimal newSourceBalance = accounts.changeBalance(sourceUsername, convertedSourceAmount, false);
+            if (newSourceBalance != null) {
+              BigDecimal newDestinationBalance = accounts.changeBalance(destinationUsername, convertedDestinationAmount, true);
+              System.out.println("Transferred " + convertedSourceAmount + " " + sourcePreferredCurrency + (admin ? "/" + convertedDestinationAmount + " " + destinationPreferredCurrency + " from the account of " + sourceUsername + " to the account of " : " from your account to the account of ") + destinationUsername + (admin ? ". Their new balances are " : ". Your new balance is ") + newSourceBalance + " " + sourcePreferredCurrency + (admin ? " and " + newDestinationBalance + " " + destinationPreferredCurrency + " respectively." : "."));
+            } else {
+              System.out.println("Insufficient funds.");
+            }
           }
         }
       } else {
