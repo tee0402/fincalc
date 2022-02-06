@@ -43,10 +43,9 @@ class FinCalc {
 
     while (true) {
       System.out.print(">> ");
-
       lineScanner = new Scanner(scanner.nextLine());
-      String command = lineScanner.next();
 
+      String command = lineScanner.next();
       if (command.equalsIgnoreCase("MAINT")) {
         maint();
       } else if (command.equalsIgnoreCase("ADDUSER")) {
@@ -82,6 +81,7 @@ class FinCalc {
       } else {
         System.out.println("Please enter a valid command. Type 'help' for a list of commands.");
       }
+
       lineScanner.close();
     }
   }
@@ -93,10 +93,9 @@ class FinCalc {
 
     while (true) {
       System.out.print(">> ");
-
       lineScanner = new Scanner(scanner.nextLine());
-      String command = lineScanner.next();
 
+      String command = lineScanner.next();
       if (command.equalsIgnoreCase("BAL")) {
         bal(false);
       } else if (command.equalsIgnoreCase("ADD")) {
@@ -119,6 +118,7 @@ class FinCalc {
       } else {
         System.out.println("Please enter a valid command. Type 'help' for a list of commands.");
       }
+
       lineScanner.close();
     }
   }

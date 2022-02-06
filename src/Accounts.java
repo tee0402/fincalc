@@ -100,13 +100,12 @@ class Accounts {
 
   // Adds a new account with balance 0 to the text file and ArrayList
   boolean addAccount(String username, String password, String preferredCurrency) {
-    if (contains(username)) {
-      return false;
-    } else {
+    if (!contains(username)) {
       String salt = salt();
       accounts.add(new Account(username, salt, hash(salt + password), preferredCurrency, BigDecimal.ZERO));
       return write();
     }
+    return false;
   }
 
   // Deletes an account

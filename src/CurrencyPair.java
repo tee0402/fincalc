@@ -25,7 +25,6 @@ class CurrencyPair {
   String getConversionRateString() {
     return conversionRate.toPlainString();
   }
-
   void setConversionRate(BigDecimal conversionRate) {
     this.conversionRate = conversionRate;
   }

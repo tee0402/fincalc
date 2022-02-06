@@ -17,8 +17,7 @@ class CurrencyPairs {
       if (file.exists() || file.createNewFile()) {
         Scanner scanner = new Scanner(file);
         while (scanner.hasNextLine()) {
-          String line = scanner.nextLine();
-          Scanner lineScanner = new Scanner(line);
+          Scanner lineScanner = new Scanner(scanner.nextLine());
           currencyPairs.add(new CurrencyPair(lineScanner.next(), lineScanner.next(), new BigDecimal(lineScanner.next())));
         }
         scanner.close();
