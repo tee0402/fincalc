@@ -1,7 +1,7 @@
 # FinCalc 2.0
 FinCalc 2.0 is a financial calculator capable of allowing multiple users to add and subtract money from their own accounts, as well as transfer money to other accounts.
 
-The easiest way to run this program is to clone this repository to your favorite Java IDE, such as IntelliJ IDEA, and run main.java. Otherwise, if you have JDK installed, you should download the src folder from the repository. Then open up your command line prompt and cd into the src folder. Run `javac Main.java FinCalc.java Accounts.java CurrencyPairs.java` and then run `java Main`. The program should run. You may get an error with the javac command on Windows, in which case you need to set the path variable using `set path=%path%;C:\Program Files\Java\jdk1.8.0_131\bin` or wherever you have the JDK installed.
+The easiest way to run this program is to clone this repository to your favorite Java IDE, such as IntelliJ IDEA, and run main.java. Otherwise, if you have JDK installed, you should download the src folder from the repository. Then open up your command line prompt and cd into the src folder. Run `javac *` and then run `java Main`. The program should run. You may get an error with the javac command on Windows, in which case you need to set the path variable using `set path=%path%;C:\Program Files\Java\jdk1.8.0_131\bin` or wherever you have the JDK installed.
 
 Once the application has started, you will need to login. The credentials for the management account are `admin` for the username and `admin` for the password. Once logged in, type `help` to see a list of commands. Several commands are only accessible by the admin account. `MAINT [currency 1] [currency 2] [conversion rate]` is used to enter in currency conversion data. `ADDUSER [username] [password] [preferred currency]` and `DELUSER [username]` allow the admin to add and delete users. `USERS` is used to see the list of all usernames. Other commands are accessible to all accounts, but the admin needs to specify the account to manipulate with an additional `[username]` parameter. `BAL` is used to check the user's account balance. `ADD [currency] [amount]` is used to deposit into a user's own account. `SUB [currency] [amount]` is used to withdraw from a user's own account. `transfer [username] [currency] [amount]` is used to transfer money from a user's own account to another account. `quit` exits the program.
 
@@ -24,10 +24,10 @@ Account added successfully.
 Account added successfully.
 >> deluser mary8
 Account deleted successfully.
->> add usd 100
-Added 100.00 USD to your account. Your new balance is 100.00 USD.
->> sub jpy 100
-Removed 0.83 USD from your account. Your new balance is 99.17 USD.
+>> add admin usd 100
+Deposited 100.00 USD into the account of admin. Its new balance is 100.00 USD.
+>> sub admin jpy 100
+Withdrew 0.83 USD from the account of admin. Its new balance is 99.17 USD.
 >> maint eur usd 1.18
 EUR/USD=1.18
 Would you like to save this currency conversion data in the database? (y/n): y
@@ -36,8 +36,8 @@ Currency pair saved.
 EUR/JPY=132.2
 Would you like to save this currency conversion data in the database? (y/n): y
 Currency pair saved.
->> transfer john12 eur 50
-Transferred 59.00 USD/6610.00 JPY from your account to the account of john12. Your new balance is 40.17 USD. Their new balance is 6610.00 JPY.
+>> transfer admin john12 eur 50
+Transferred 59.00 USD/6610.00 JPY from the account of admin to the account of john12. Their new balances are 40.17 USD and 6610.00 JPY respectively.
 ```
 
 ---
