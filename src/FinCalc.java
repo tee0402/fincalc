@@ -333,8 +333,8 @@ class FinCalc {
     }
   }
 
-  private boolean isPositive(BigDecimal bigDecimal) {
-    return bigDecimal.compareTo(BigDecimal.ZERO) > 0;
+  private boolean isPositive(BigDecimal amount) {
+    return amount.compareTo(BigDecimal.ZERO) > 0;
   }
 
   // Round amount to two decimal places

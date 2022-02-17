@@ -127,7 +127,7 @@ class CurrencyPairs {
     }
 
     private boolean equalsIgnoreOrder(String currency1, String currency2) {
-      return (this.currency1.equals(currency1) && this.currency2.equals(currency2)) || (this.currency2.equals(currency1) && this.currency1.equals(currency2));
+      return equals(currency1, currency2) || equals(currency2, currency1);
     }
   }
 }
