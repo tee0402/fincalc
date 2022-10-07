@@ -64,10 +64,10 @@ class FinCalc {
         transfer(true);
       } else if (command.equalsIgnoreCase("help")) {
         System.out.println("Use ISO Codes for currencies, e.g. USD, EUR, JPY");
-        System.out.println("Conversion rate is the number of units of currency 2 that are equal to one unit of currency 1");
+        System.out.println("Exchange rate is the number of units of currency 2 that are equal to one unit of currency 1");
         System.out.println();
         System.out.println("LIST OF COMMANDS:");
-        System.out.println("MAINT [currency 1] [currency 2] [conversion rate] - Enter currency conversion data");
+        System.out.println("MAINT [currency 1] [currency 2] [exchange rate] - Enter currency exchange data");
         System.out.println("ADDUSER [username] [password] [preferred currency] - Add a new account with <username> and <password> and set the preferred currency");
         System.out.println("DELUSER [username] - Delete account with <username>");
         System.out.println("USERS - Show list of account usernames");
@@ -126,24 +126,24 @@ class FinCalc {
   private void maint() {
     String currency1 = readStringToUpperCase();
     String currency2 = readStringToUpperCase();
-    BigDecimal conversionRate = readBigDecimalStripTrailingZeros();
+    BigDecimal exchangeRate = readBigDecimalStripTrailingZeros();
     boolean currency1Validated = validateCurrencyInput(currency1);
     boolean currency2Validated = validateCurrencyInput(currency2);
 
-    if (!currency1.equals(currency2) && currency1Validated && currency2Validated && isPositive(conversionRate)) {
-      System.out.println(currency1 + "/" + currency2 + "=" + conversionRate.toPlainString());
+    if (!currency1.equals(currency2) && currency1Validated && currency2Validated && isPositive(exchangeRate)) {
+      System.out.println(currency1 + "/" + currency2 + "=" + exchangeRate.toPlainString());
 
-      CurrencyPairs.CurrencyPair currencyPair = currencyPairs.getCurrencyPairIgnoreOrder(currency1, currency2);
-      if (currencyPair != null) {
-        System.out.print("Currency pair " + currencyPair.getCurrency1() + "/" + currencyPair.getCurrency2() + "=" + currencyPair.getConversionRateString() + " already exists. Overwrite? (y/n): ");
+      BigDecimal prevExchangeRate = currencyPairs.getExchangeRate(currency1, currency2);
+      if (prevExchangeRate != null) {
+        System.out.print("Currency pair " + currency1 + "/" + currency2 + "=" + prevExchangeRate.toPlainString() + " already exists. Overwrite? (y/n): ");
       } else {
-        System.out.print("Would you like to save this currency conversion data in the database? (y/n): ");
+        System.out.print("Would you like to save this currency exchange data in the database? (y/n): ");
       }
 
       while (true) {
         String command = scanner.nextLine();
         if (command.equalsIgnoreCase("y")) {
-          if (currencyPairs.addOrUpdateCurrencyPairIgnoreOrder(currency1, currency2, conversionRate)) {
+          if (currencyPairs.putCurrencyPair(currency1, currency2, exchangeRate)) {
             System.out.println("Currency pair saved.");
           } else {
             System.out.println("Saving failed.");
@@ -158,7 +158,7 @@ class FinCalc {
       }
     } else {
       System.out.println("Please enter valid arguments for MAINT:");
-      System.out.println("MAINT [currency 1] [currency 2] [conversion rate]");
+      System.out.println("MAINT [currency 1] [currency 2] [exchange rate]");
     }
   }
 
@@ -223,7 +223,7 @@ class FinCalc {
         String preferredCurrency = accounts.getPreferredCurrency(username);
         BigDecimal convertedAmount = currencyPairs.convert(currency, preferredCurrency, amount);
         if (convertedAmount == null) {
-          System.out.println("No conversion data from " + currency + " to " + preferredCurrency + ". Please enter conversion data first.");
+          System.out.println("No exchange data from " + currency + " to " + preferredCurrency + ". Please enter exchange data first.");
         } else {
           BigDecimal newBalance = accounts.changeBalance(username, convertedAmount, deposit);
           if (newBalance != null) {
@@ -257,10 +257,10 @@ class FinCalc {
           BigDecimal convertedSourceAmount = currencyPairs.convert(currency, sourcePreferredCurrency, amount);
           BigDecimal convertedDestinationAmount = currencyPairs.convert(currency, destinationPreferredCurrency, amount);
           if (convertedSourceAmount == null) {
-            System.out.println("No conversion data from " + currency + " to " + sourcePreferredCurrency + ". Please enter conversion data first.");
+            System.out.println("No exchange data from " + currency + " to " + sourcePreferredCurrency + ". Please enter exchange data first.");
           }
           if (convertedDestinationAmount == null) {
-            System.out.println("No conversion data from " + currency + " to " + destinationPreferredCurrency + ". Please enter conversion data first.");
+            System.out.println("No exchange data from " + currency + " to " + destinationPreferredCurrency + ". Please enter exchange data first.");
           }
           if (convertedSourceAmount != null && convertedDestinationAmount != null) {
             BigDecimal newSourceBalance = accounts.changeBalance(sourceUsername, convertedSourceAmount, false);
