@@ -6,11 +6,12 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 class Accounts {
-  private final ArrayList<Account> accounts = new ArrayList<>();
+  private final Map<String, Account> accounts = new HashMap<>();
 
   Accounts() {
     try {
@@ -20,7 +21,8 @@ class Accounts {
         Scanner scanner = new Scanner(file);
         while (scanner.hasNextLine()) {
           Scanner lineScanner = new Scanner(scanner.nextLine());
-          accounts.add(new Account(lineScanner.next(), lineScanner.next(), lineScanner.next(), lineScanner.next(), new BigDecimal(lineScanner.next())));
+          String username = lineScanner.next();
+          accounts.put(username, new Account(username, lineScanner.next(), lineScanner.next(), lineScanner.next(), new BigDecimal(lineScanner.next())));
         }
         scanner.close();
       } else if (file.createNewFile()) {
@@ -62,12 +64,7 @@ class Accounts {
 
   // Returns the account with the specified username if found and null otherwise
   private Account getAccount(String username) {
-    for (Account account : accounts) {
-      if (account.getUsername().equals(username)) {
-        return account;
-      }
-    }
-    return null;
+    return accounts.get(username);
   }
 
   BigDecimal getBalance(String username) {
@@ -102,7 +99,7 @@ class Accounts {
   boolean addAccount(String username, String password, String preferredCurrency) {
     if (!contains(username)) {
       String salt = salt();
-      accounts.add(new Account(username, salt, hash(salt + password), preferredCurrency, BigDecimal.ZERO));
+      accounts.put(username, new Account(username, salt, hash(salt + password), preferredCurrency, BigDecimal.ZERO));
       return write();
     }
     return false;
@@ -110,17 +107,16 @@ class Accounts {
 
   // Deletes an account
   boolean deleteAccount(String username) {
-    Account account = getAccount(username);
-    if (account != null) {
-      accounts.remove(account);
+    if (contains(username)) {
+      accounts.remove(username);
       return write();
     }
     return false;
   }
 
   void printUsernames() {
-    for (Account account : accounts) {
-      System.out.println(account.getUsername());
+    for (String username : accounts.keySet()) {
+      System.out.println(username);
     }
   }
 
@@ -151,7 +147,7 @@ class Accounts {
   private boolean write() {
     try {
       FileWriter fileWriter = new FileWriter("accounts.txt");
-      for (Account account : accounts) {
+      for (Account account : accounts.values()) {
         fileWriter.write(account.getUsername() + " " + account.getSalt() + " " + account.getPassword() + " " + account.getPreferredCurrency() + " " + account.getBalance() + "\n");
       }
       fileWriter.close();
