@@ -85,7 +85,7 @@ class Accounts {
 
   // Returns true if the account with the specified username exists and false otherwise
   boolean contains(String username) {
-    return getAccount(username) != null;
+    return accounts.containsKey(username);
   }
 
   // Returns a 256-bit salt

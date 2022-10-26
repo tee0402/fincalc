@@ -41,45 +41,38 @@ class FinCalc {
     System.out.println("FinCalc 2.0 - ADMIN");
     System.out.println("Type 'help' for a list of commands.");
 
-    while (true) {
+    boolean running = true;
+    while (running) {
       System.out.print(">> ");
       lineScanner = new Scanner(scanner.nextLine());
 
-      String command = lineScanner.next();
-      if (command.equalsIgnoreCase("MAINT")) {
-        maint();
-      } else if (command.equalsIgnoreCase("ADDUSER")) {
-        addUser();
-      } else if (command.equalsIgnoreCase("DELUSER")) {
-        delUser();
-      } else if (command.equalsIgnoreCase("USERS")) {
-        users();
-      } else if (command.equalsIgnoreCase("BAL")) {
-        bal(true);
-      } else if (command.equalsIgnoreCase("ADD")) {
-        changeBalance(true, true);
-      } else if (command.equalsIgnoreCase("SUB")) {
-        changeBalance(false, true);
-      } else if (command.equalsIgnoreCase("TRANSFER")) {
-        transfer(true);
-      } else if (command.equalsIgnoreCase("help")) {
-        System.out.println("Use ISO Codes for currencies, e.g. USD, EUR, JPY");
-        System.out.println("Exchange rate is the number of units of currency 2 that are equal to one unit of currency 1");
-        System.out.println();
-        System.out.println("LIST OF COMMANDS:");
-        System.out.println("MAINT [currency 1] [currency 2] [exchange rate] - Enter currency exchange data");
-        System.out.println("ADDUSER [username] [password] [preferred currency] - Add a new account with <username> and <password> and set the preferred currency");
-        System.out.println("DELUSER [username] - Delete account with <username>");
-        System.out.println("USERS - Show list of account usernames");
-        System.out.println("BAL [username] - Show balance in the preferred currency of account wth <username>");
-        System.out.println("ADD [username] [currency] [amount] - Deposit <amount> in <currency> into account with <username>");
-        System.out.println("SUB [username] [currency] [amount] - Withdraw <amount> in <currency> from account with <username>");
-        System.out.println("TRANSFER [username 1] [username 2] [currency] [amount] - Transfer <amount> in <currency> from account with <username 1> to account with <username 2>");
-        System.out.println("quit - Exit the program");
-      } else if (command.equalsIgnoreCase("quit")) {
-        break;
-      } else {
-        System.out.println("Please enter a valid command. Type 'help' for a list of commands.");
+      String command = readStringToUpperCase();
+      switch (command) {
+        case "MAINT" -> maint();
+        case "ADDUSER" -> addUser();
+        case "DELUSER" -> delUser();
+        case "USERS" -> users();
+        case "BAL" -> bal(true);
+        case "ADD" -> changeBalance(true, true);
+        case "SUB" -> changeBalance(false, true);
+        case "TRANSFER" -> transfer(true);
+        case "HELP" -> {
+          System.out.println("Use ISO Codes for currencies, e.g. USD, EUR, JPY");
+          System.out.println("Exchange rate is the number of units of currency 2 that are equal to one unit of currency 1");
+          System.out.println();
+          System.out.println("LIST OF COMMANDS:");
+          System.out.println("MAINT [currency 1] [currency 2] [exchange rate] - Enter currency exchange data");
+          System.out.println("ADDUSER [username] [password] [preferred currency] - Add a new account with <username> and <password> and set the preferred currency");
+          System.out.println("DELUSER [username] - Delete account with <username>");
+          System.out.println("USERS - Show list of account usernames");
+          System.out.println("BAL [username] - Show balance in the preferred currency of account wth <username>");
+          System.out.println("ADD [username] [currency] [amount] - Deposit <amount> in <currency> into account with <username>");
+          System.out.println("SUB [username] [currency] [amount] - Withdraw <amount> in <currency> from account with <username>");
+          System.out.println("TRANSFER [username 1] [username 2] [currency] [amount] - Transfer <amount> in <currency> from account with <username 1> to account with <username 2>");
+          System.out.println("quit - Exit the program");
+        }
+        case "QUIT" -> running = false;
+        default -> System.out.println("Please enter a valid command. Type 'help' for a list of commands.");
       }
 
       lineScanner.close();
@@ -91,32 +84,29 @@ class FinCalc {
     System.out.println("FinCalc 2.0");
     System.out.println("Type 'help' for a list of commands.");
 
-    while (true) {
+    boolean running = true;
+    while (running) {
       System.out.print(">> ");
       lineScanner = new Scanner(scanner.nextLine());
 
-      String command = lineScanner.next();
-      if (command.equalsIgnoreCase("BAL")) {
-        bal(false);
-      } else if (command.equalsIgnoreCase("ADD")) {
-        changeBalance(true, false);
-      } else if (command.equalsIgnoreCase("SUB")) {
-        changeBalance(false, false);
-      } else if (command.equalsIgnoreCase("TRANSFER")) {
-        transfer(false);
-      } else if (command.equalsIgnoreCase("help")) {
-        System.out.println("Use ISO Codes for currencies, e.g. USD, EUR, JPY");
-        System.out.println();
-        System.out.println("LIST OF COMMANDS:");
-        System.out.println("BAL - Show your balance in your preferred currency");
-        System.out.println("ADD [currency] [amount] - Deposit <amount> in <currency> into your account");
-        System.out.println("SUB [currency] [amount] - Withdraw <amount> in <currency> from your account");
-        System.out.println("TRANSFER [username] [currency] [amount] - Transfer <amount> in <currency> from your account to account with <username>");
-        System.out.println("quit - Exit the program");
-      } else if (command.equalsIgnoreCase("quit")) {
-        break;
-      } else {
-        System.out.println("Please enter a valid command. Type 'help' for a list of commands.");
+      String command = readStringToUpperCase();
+      switch (command) {
+        case "BAL" -> bal(false);
+        case "ADD" -> changeBalance(true, false);
+        case "SUB" -> changeBalance(false, false);
+        case "TRANSFER" -> transfer(false);
+        case "HELP" -> {
+          System.out.println("Use ISO Codes for currencies, e.g. USD, EUR, JPY");
+          System.out.println();
+          System.out.println("LIST OF COMMANDS:");
+          System.out.println("BAL - Show your balance in your preferred currency");
+          System.out.println("ADD [currency] [amount] - Deposit <amount> in <currency> into your account");
+          System.out.println("SUB [currency] [amount] - Withdraw <amount> in <currency> from your account");
+          System.out.println("TRANSFER [username] [currency] [amount] - Transfer <amount> in <currency> from your account to account with <username>");
+          System.out.println("quit - Exit the program");
+        }
+        case "QUIT" -> running = false;
+        default -> System.out.println("Please enter a valid command. Type 'help' for a list of commands.");
       }
 
       lineScanner.close();
@@ -140,20 +130,23 @@ class FinCalc {
         System.out.print("Would you like to save this currency exchange data in the database? (y/n): ");
       }
 
-      while (true) {
-        String command = scanner.nextLine();
-        if (command.equalsIgnoreCase("y")) {
-          if (currencyPairs.putCurrencyPair(currency1, currency2, exchangeRate)) {
-            System.out.println("Currency pair saved.");
-          } else {
-            System.out.println("Saving failed.");
+      boolean saving = true;
+      while (saving) {
+        String command = scanner.nextLine().trim().toLowerCase();
+        switch (command) {
+          case "y" -> {
+            if (currencyPairs.putCurrencyPair(currency1, currency2, exchangeRate)) {
+              System.out.println("Currency pair saved.");
+            } else {
+              System.out.println("Saving failed.");
+            }
+            saving = false;
           }
-          break;
-        } else if (command.equalsIgnoreCase("n")) {
-          System.out.println("Saving canceled.");
-          break;
-        } else {
-          System.out.print("Please enter 'y' for yes or 'n' for no: ");
+          case "n" -> {
+            System.out.println("Saving canceled.");
+            saving = false;
+          }
+          default -> System.out.print("Please enter 'y' for yes or 'n' for no: ");
         }
       }
     } else {

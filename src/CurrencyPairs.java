@@ -18,9 +18,7 @@ class CurrencyPairs {
         while (scanner.hasNextLine()) {
           Scanner lineScanner = new Scanner(scanner.nextLine());
           String currency1 = lineScanner.next();
-          if (!currencyPairs.containsKey(currency1)) {
-            currencyPairs.put(currency1, new HashMap<>());
-          }
+          currencyPairs.putIfAbsent(currency1, new HashMap<>());
           currencyPairs.get(currency1).put(lineScanner.next(), new BigDecimal(lineScanner.next()));
         }
         scanner.close();
@@ -68,13 +66,9 @@ class CurrencyPairs {
 
   // Adds or updates a currency pair
   boolean putCurrencyPair(String currency1, String currency2, BigDecimal exchangeRate) {
-    if (!currencyPairs.containsKey(currency1)) {
-      currencyPairs.put(currency1, new HashMap<>());
-    }
+    currencyPairs.putIfAbsent(currency1, new HashMap<>());
     currencyPairs.get(currency1).put(currency2, exchangeRate);
-    if (!currencyPairs.containsKey(currency2)) {
-      currencyPairs.put(currency2, new HashMap<>());
-    }
+    currencyPairs.putIfAbsent(currency2, new HashMap<>());
     currencyPairs.get(currency2).put(currency1, BigDecimal.ONE.divide(exchangeRate, new MathContext(20, RoundingMode.HALF_EVEN)));
     return write();
   }
