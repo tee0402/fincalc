@@ -28,6 +28,7 @@ class CurrencyPairs {
     }
   }
 
+  private record Tuple(String currency, BigDecimal exchangeRate) {}
   // Returns the exchange rate for the currency pair if found and null otherwise
   BigDecimal getExchangeRate(String currency1, String currency2) {
     // BFS
@@ -53,15 +54,6 @@ class CurrencyPairs {
       }
     }
     return null;
-  }
-
-  private static class Tuple {
-    private final String currency;
-    private final BigDecimal exchangeRate;
-    private Tuple(String currency, BigDecimal exchangeRate) {
-      this.currency = currency;
-      this.exchangeRate = exchangeRate;
-    }
   }
 
   // Adds or updates a currency pair
