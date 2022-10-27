@@ -34,22 +34,21 @@ class CurrencyPairs {
     // BFS
     Set<String> visited = new HashSet<>();
     Queue<Tuple> q = new ArrayDeque<>();
-    visited.add(currency1);
-    q.add(new Tuple(currency1, BigDecimal.ONE));
+    if (currencyPairs.containsKey(currency1)) {
+      visited.add(currency1);
+      q.add(new Tuple(currency1, BigDecimal.ONE));
+    }
     while (!q.isEmpty()) {
       Tuple tuple = q.poll();
-      String currency = tuple.currency;
+      Map<String, BigDecimal> pairs = currencyPairs.get(tuple.currency);
       BigDecimal exchangeRate = tuple.exchangeRate;
-      if (currencyPairs.containsKey(currency)) {
-        Map<String, BigDecimal> pairs = currencyPairs.get(currency);
-        if (pairs.containsKey(currency2)) {
-          return exchangeRate.multiply(pairs.get(currency2));
-        }
-        for (String pairCurrency : pairs.keySet()) {
-          if (!visited.contains(pairCurrency)) {
-            visited.add(pairCurrency);
-            q.add(new Tuple(pairCurrency, exchangeRate.multiply(pairs.get(pairCurrency))));
-          }
+      if (pairs.containsKey(currency2)) {
+        return exchangeRate.multiply(pairs.get(currency2));
+      }
+      for (String pairCurrency : pairs.keySet()) {
+        if (!visited.contains(pairCurrency)) {
+          visited.add(pairCurrency);
+          q.add(new Tuple(pairCurrency, exchangeRate.multiply(pairs.get(pairCurrency))));
         }
       }
     }

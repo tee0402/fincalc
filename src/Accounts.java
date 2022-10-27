@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Scanner;
 
 class Accounts {
@@ -54,12 +55,8 @@ class Accounts {
 
   // Authenticates a username-password pair
   boolean authenticate(String username, String password) {
-    String hash = null;
     Account account = getAccount(username);
-    if (account != null) {
-      hash = hash(account.getSalt() + password);
-    }
-    return hash != null && hash.equals(account.getPassword());
+    return account != null && Objects.equals(hash(account.getSalt() + password), account.getPassword());
   }
 
   // Returns the account with the specified username if found and null otherwise
@@ -69,18 +66,12 @@ class Accounts {
 
   BigDecimal getBalance(String username) {
     Account account = getAccount(username);
-    if (account != null) {
-      return account.getBalance();
-    }
-    return null;
+    return account == null ? null : account.getBalance();
   }
 
   String getPreferredCurrency(String username) {
     Account account = getAccount(username);
-    if (account != null) {
-      return account.getPreferredCurrency();
-    }
-    return null;
+    return account == null ? null : account.getPreferredCurrency();
   }
 
   // Returns true if the account with the specified username exists and false otherwise
@@ -97,21 +88,21 @@ class Accounts {
 
   // Adds a new account with balance 0 to the text file and ArrayList
   boolean addAccount(String username, String password, String preferredCurrency) {
-    if (!contains(username)) {
-      String salt = salt();
-      accounts.put(username, new Account(username, salt, hash(salt + password), preferredCurrency, BigDecimal.ZERO));
-      return write();
+    if (contains(username)) {
+      return false;
     }
-    return false;
+    String salt = salt();
+    accounts.put(username, new Account(username, salt, hash(salt + password), preferredCurrency, BigDecimal.ZERO));
+    return write();
   }
 
   // Deletes an account
   boolean deleteAccount(String username) {
-    if (contains(username)) {
-      accounts.remove(username);
-      return write();
+    if (!contains(username)) {
+      return false;
     }
-    return false;
+    accounts.remove(username);
+    return write();
   }
 
   void printUsernames() {
@@ -123,24 +114,17 @@ class Accounts {
   // Changes the balance of the account with the specified username, returns the new balance or null if the change failed
   BigDecimal changeBalance(String username, BigDecimal amount, boolean deposit) {
     Account account = getAccount(username);
-    if (account != null) {
-      if (deposit) {
-        BigDecimal newBalance = FinCalc.round(account.getBalance().add(amount));
-        account.setBalance(newBalance);
-        write();
-        return newBalance;
-      } else {
-        BigDecimal newBalance = FinCalc.round(account.getBalance().subtract(amount));
-        if (newBalance.compareTo(BigDecimal.ZERO) >= 0) {
-          account.setBalance(newBalance);
-          write();
-          return newBalance;
-        } else {
-          return null;
-        }
-      }
+    if (account == null) {
+      return null;
     }
-    return null;
+    BigDecimal oldBalance = account.getBalance();
+    BigDecimal newBalance = FinCalc.round(deposit ? oldBalance.add(amount) :  oldBalance.subtract(amount));
+    if (!deposit && newBalance.compareTo(BigDecimal.ZERO) < 0) {
+      return null;
+    }
+    account.setBalance(newBalance);
+    write();
+    return newBalance;
   }
 
   // Updates text file containing accounts

@@ -124,10 +124,10 @@ class FinCalc {
       System.out.println(currency1 + "/" + currency2 + "=" + exchangeRate.toPlainString());
 
       BigDecimal prevExchangeRate = currencyPairs.getExchangeRate(currency1, currency2);
-      if (prevExchangeRate != null) {
-        System.out.print("Currency pair " + currency1 + "/" + currency2 + "=" + prevExchangeRate.toPlainString() + " already exists. Overwrite? (y/n): ");
-      } else {
+      if (prevExchangeRate == null) {
         System.out.print("Would you like to save this currency exchange data in the database? (y/n): ");
+      } else {
+        System.out.print("Currency pair " + currency1 + "/" + currency2 + "=" + prevExchangeRate.toPlainString() + " already exists. Overwrite? (y/n): ");
       }
 
       boolean saving = true;
@@ -219,10 +219,10 @@ class FinCalc {
           System.out.println("No exchange data from " + currency + " to " + preferredCurrency + ". Please enter exchange data first.");
         } else {
           BigDecimal newBalance = accounts.changeBalance(username, convertedAmount, deposit);
-          if (newBalance != null) {
-            System.out.println((deposit ? "Deposited " : "Withdrew ") + convertedAmount + " " + preferredCurrency + (admin ? (deposit ? " into the account of " : " from the account of ") + username + ". Its new balance is " : (deposit ? " into your account. Your new balance is " : " from your account. Your new balance is ")) + newBalance + " " + preferredCurrency + ".");
-          } else {
+          if (newBalance == null) {
             System.out.println("Insufficient funds.");
+          } else {
+            System.out.println((deposit ? "Deposited " : "Withdrew ") + convertedAmount + " " + preferredCurrency + (admin ? (deposit ? " into the account of " : " from the account of ") + username + ". Its new balance is " : (deposit ? " into your account. Your new balance is " : " from your account. Your new balance is ")) + newBalance + " " + preferredCurrency + ".");
           }
         }
       } else {
@@ -257,11 +257,11 @@ class FinCalc {
           }
           if (convertedSourceAmount != null && convertedDestinationAmount != null) {
             BigDecimal newSourceBalance = accounts.changeBalance(sourceUsername, convertedSourceAmount, false);
-            if (newSourceBalance != null) {
+            if (newSourceBalance == null) {
+              System.out.println("Insufficient funds.");
+            } else {
               BigDecimal newDestinationBalance = accounts.changeBalance(destinationUsername, convertedDestinationAmount, true);
               System.out.println("Transferred " + convertedSourceAmount + " " + sourcePreferredCurrency + (admin ? "/" + convertedDestinationAmount + " " + destinationPreferredCurrency + " from the account of " + sourceUsername + " to the account of " : " from your account to the account of ") + destinationUsername + (admin ? ". Their new balances are " : ". Your new balance is ") + newSourceBalance + " " + sourcePreferredCurrency + (admin ? " and " + newDestinationBalance + " " + destinationPreferredCurrency + " respectively." : "."));
-            } else {
-              System.out.println("Insufficient funds.");
             }
           }
         }
