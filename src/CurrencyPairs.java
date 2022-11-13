@@ -17,9 +17,11 @@ class CurrencyPairs {
         Scanner scanner = new Scanner(file);
         while (scanner.hasNextLine()) {
           Scanner lineScanner = new Scanner(scanner.nextLine());
-          String currency1 = lineScanner.next();
-          currencyPairs.putIfAbsent(currency1, new HashMap<>());
-          currencyPairs.get(currency1).put(lineScanner.next(), new BigDecimal(lineScanner.next()));
+          Map<String, BigDecimal> currency1Pairs = new HashMap<>();
+          currencyPairs.put(lineScanner.next(), currency1Pairs);
+          while (lineScanner.hasNext()) {
+            currency1Pairs.put(lineScanner.next(), new BigDecimal(lineScanner.next()));
+          }
         }
         scanner.close();
       }
@@ -69,9 +71,12 @@ class CurrencyPairs {
     try {
       FileWriter fileWriter = new FileWriter("currencypairs.txt");
       for (String currency1 : currencyPairs.keySet()) {
-        for (String currency2 : currencyPairs.get(currency1).keySet()) {
-          fileWriter.write(currency1 + " " + currency2 + " " + currencyPairs.get(currency1).get(currency2) + "\n");
+        StringBuilder currency1String = new StringBuilder(currency1);
+        Map<String, BigDecimal> currency1Pairs = currencyPairs.get(currency1);
+        for (String currency2 : currency1Pairs.keySet()) {
+          currency1String.append(" ").append(currency2).append(" ").append(currency1Pairs.get(currency2));
         }
+        fileWriter.write(currency1String + "\n");
       }
       fileWriter.close();
       return true;
